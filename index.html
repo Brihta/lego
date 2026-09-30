@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Svet Lego junakov</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --lego-yellow: #FFD700;
+    --lego-red: #D11013;
+    --lego-blue: #0055BF;
+    --lego-green: #228B22;
+    --bg-color: #f4f4f4;
+    --stud-color: #e0e0e0; /* Barva za krogce v ozadju */
+}
+
+body {
+    font-family: 'Fredoka', 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    /* Lego ozadje s čepki */
+    background-color: var(--bg-color);
+    background-image: radial-gradient(var(--stud-color) 15%, transparent 16%), radial-gradient(var(--stud-color) 15%, transparent 16%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    color: #333;
+    overflow: hidden;
+}
+
+/* --- GLAVA --- */
+header {
+    background-color: var(--lego-red);
+    color: white;
+    text-align: center;
+    padding: 15px;
+    font-size: 32px;
+    font-weight: 700;
+    box-shadow: 0 6px 0 #8b0a0d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    z-index: 10;
+    position: relative;
+}
+
+/* --- GLAVNA RAZPOREDITEV --- */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* Prepreči drsenje celotne strani */
+}
+
+.column {
+    padding: 15px;
+    overflow-y: auto; /* Vsak stolpec drsi posebej */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Specifične širine in ozadja stolpcev */
+#char-pool { width: 30%; background-color: rgba(232, 232, 232, 0.9); border-right: 4px solid #ccc; }
+#active-zone { width: 40%; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); }
+#student-pool { width: 30%; background-color: rgba(232, 232, 232, 0.9); border-left: 4px solid #ccc; }
+
+h2 {
+    font-size: 1.2rem;
+    background: var(--lego-blue);
+    color: white;
+    padding: 8px 25px;
+    border-radius: 30px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 0 #003a82;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* --- GUMBI --- */
+.btn {
+    border: none;
+    padding: 12px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.1s;
+    width: 90%;
+    text-align: center;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    font-family: 'Fredoka', sans-serif;
+    position: relative;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2) !important; }
+.btn:hover { filter: brightness(1.1); }
+
+.return-all-btn { background-color: var(--lego-yellow); color: #333; box-shadow: 0 4px 0 #b89b00; }
+
+.mode-btn { background-color: var(--lego-blue); color: white; box-shadow: 0 4px 0 #003a82; }
+.mode-btn.active { background-color: var(--lego-red); box-shadow: 0 4px 0 #8b0a0d; animation: pulse 1s infinite; }
+
+.random-btn { background-color: var(--lego-yellow); color: #333; box-shadow: 0 4px 0 #b89b00; font-size: 1rem; border: 2px solid #fff; }
+
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
+/* --- MREŽE ZA IZBIRO (Levo in Desno) --- */
+#char-list, #student-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 0 #ddd;
+    cursor: pointer;
+    padding: 8px;
+    text-align: center;
+    border: 3px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.1s;
+}
+.card:active { transform: scale(0.95); }
+.card.selected { border-color: var(--lego-blue); background-color: #e6f0ff; transform: translateY(-2px); }
+/* Rumena obroba za večkratno izbiro */
+.card.highlight { background-color: #fff9c4; border-color: var(--lego-yellow); box-shadow: 0 4px 0 orange; transform: translateY(-2px); }
+/* Figurice so med skupinsko izbiro zatemnjene, ker jih ni mogoče klikniti */
+.card.disabled { opacity: 0.5; cursor: default; }
+
+.card img { width: 100%; height: 80px; object-fit: contain; }
+.card-name { font-weight: 600; font-size: 0.85rem; margin-top: 5px; line-height: 1.1; }
+
+/* --- SREDINA: AKTIVNE IZPOSOJE --- */
+#rental-list {
+    display: grid;
+    gap: 15px;
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+/* Razporeditev stolpcev glede na gnečo */
+#rental-list.grid-1 { grid-template-columns: 1fr; }
+#rental-list.grid-2 { grid-template-columns: repeat(2, 1fr); }
+#rental-list.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* Animacija prihoda nove kartice */
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
+
+.rental-pair {
+    display: grid;
+    /* KLJUČNO: Slika levo (40%), Tekst desno (60%) */
+    grid-template-columns: 40% 60%;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    border-left: 12px solid var(--lego-yellow);
+    overflow: hidden;
+    align-items: center;
+    padding: 10px;
+    position: relative;
+}
+/* Animacija samo za novo dodano kartico, ne ob vsakem izrisu */
+.rental-pair.new { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.rental-pair.expired { border-left-color: var(--lego-red); }
+
+.rental-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #fafafa;
+    border-radius: 8px;
+    margin-right: 10px;
+    padding: 5px;
+    box-sizing: border-box;
+}
+.rental-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); }
+
+.rental-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left; /* VSE PORAVNANO LEVO */
+    height: 100%;
+    padding-right: 5px;
+    min-width: 0;
+}
+
+.rental-student { font-weight: 700; color: var(--lego-blue); line-height: 1.1; margin-bottom: 2px; }
+.rental-char { color: #666; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+
+.timer-display {
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #333;
+    background: #eee;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: fit-content;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+}
+.timer-display.low-time { color: white; background-color: var(--lego-red); border-color: var(--lego-red); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.7; } }
+
+.return-btn {
+    background-color: var(--lego-green);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    width: fit-content;
+    box-shadow: 0 3px 0 #155a15;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-family: 'Fredoka', sans-serif;
+}
+.return-btn:hover { background-color: #2eb82e; }
+.return-btn:active { transform: translateY(2px); box-shadow: none; }
+
+/* --- DINAMIČNO PRILAGAJANJE VELIKOSTI --- */
+/* 1-2 izposoji: VELIKE KARTICE */
+.grid-1 .rental-pair { padding: 20px; height: 200px; }
+.grid-1 .rental-img { max-height: 180px; }
+.grid-1 .rental-student { font-size: 2.2rem; margin-bottom: 5px; }
+.grid-1 .rental-char { font-size: 1.3rem; margin-bottom: 15px; }
+.grid-1 .timer-display { font-size: 2.5rem; padding: 5px 15px; }
+.grid-1 .return-btn { font-size: 1.1rem; padding: 12px 25px; }
+
+/* 3-4 izposoje: SREDNJE KARTICE */
+.grid-2 .rental-pair { padding: 10px; height: 140px; }
+.grid-2 .rental-img { max-height: 120px; }
+.grid-2 .rental-student { font-size: 1.4rem; }
+.grid-2 .rental-char { font-size: 0.9rem; }
+.grid-2 .timer-display { font-size: 1.6rem; }
+
+/* 5+ izposoj: MAJHNE KARTICE */
+.grid-3 .rental-pair { padding: 8px; height: 110px; grid-template-columns: 35% 65%; }
+.grid-3 .rental-img { max-height: 90px; }
+.grid-3 .rental-student { font-size: 1rem; }
+.grid-3 .rental-char { font-size: 0.75rem; margin-bottom: 4px; }
+.grid-3 .timer-display { font-size: 1.2rem; padding: 2px 5px; }
+.grid-3 .return-btn { padding: 4px 10px; font-size: 0.7rem; margin-top: 2px; }
+
+.empty-msg {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #999;
+    margin-top: 60px;
+    font-size: 1.3rem;
+    font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<header>🧱 Svet Lego junakov</header>
+
+<div class="main-container">
+    <div class="column" id="char-pool">
+        <h2>Figurice</h2>
+        <button class="btn return-all-btn" onclick="returnAll()">VRNI VSE ↺</button>
+        <div id="char-list"></div>
+    </div>
+
+    <div class="column" id="active-zone">
+        <div id="rental-list"></div>
+    </div>
+
+    <div class="column" id="student-pool">
+        <h2>Učenci</h2>
+        <button id="toggle-mode" class="btn mode-btn" onclick="toggleSelectionMode()">NAČIN: IZBERI UČENCE</button>
+        <button id="random-btn" class="btn random-btn" onclick="randomPairing()" style="display:none;">FIGURICE IZBIRAJO 🎲</button>
+        <div id="student-list"></div>
+    </div>
+</div>
+
+<script>
+// --- KONFIGURACIJA PODATKOV ---
+// Slike so v mapi "figurice" poleg te datoteke; ime figurice = ime datoteke.
+const characterNames = [
+    "24", "Agent Simon", "Agent Vasja", "Bradač", "Dirkač Leo", "Gabi", "Jošt Kapičar",
+    "Kockasti Zombi", "Kopač Jože", "Krotilec zmajev", "Leopold pametnjakovič", "Lovilec zmajev",
+    "Nejc", "Nika", "Pero", "Pika", "Policist Marko", "Policist Peter", "Raziskovalec Robi",
+    "Rdeči dirkač", "Robotek Rogatež", "Sončica Maša", "Strela", "Suljko", "Čeden Miki", "Črni napadalec"
+];
+const characters = characterNames.map(name => ({
+    id: name,
+    name,
+    img: encodeURI(`figurice/${name}.png`) // presledki in šumniki v URL-ju
+}));
+
+const studentNames = ["Vito", "Enej", "Ajan", "Amelia", "Sofija", "Sofia", "Iva", "Oto", "Ines", "Nina", "Maja", "Lucjan", "Adrian", "Jan", "Lia", "Maks", "Kaja", "Ula", "Rok", "Manca", "Bibi", "Lina"];
+
+const RENTAL_TIME_MINUTES = 15;
+
+// Nadomestna slika (rumena Lego kocka), če slike figurice ni mogoče naložiti
+const FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">' +
+    '<rect x="14" y="8" width="12" height="8" rx="2" fill="#e6c200"/>' +
+    '<rect x="34" y="8" width="12" height="8" rx="2" fill="#e6c200"/>' +
+    '<rect x="8" y="14" width="44" height="38" rx="4" fill="#FFD700"/>' +
+    '<text x="30" y="41" font-size="22" text-anchor="middle" fill="#8a7400" font-family="sans-serif" font-weight="bold">?</text>' +
+    '</svg>');
+
+// Brez neskončne zanke: onerror se odstrani pred zamenjavo slike
+const IMG_FALLBACK_ATTR = `onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"`;
+
+// --- STANJE APLIKACIJE ---
+let state = {
+    availableChars: [...characters],
+    availableStudents: [...studentNames],
+    rentals: [],
+    selectedCharId: null,
+    selectedStudentName: null,
+    multiSelectedStudents: [],
+    isSelectionMode: false
+};
+
+// ID-ji kartic, ki so bile ravnokar dodane (za animacijo)
+let newRentalIds = new Set();
+
+// --- FUNKCIJE ZA IZRIS (RENDER) ---
+function render() {
+    renderCharacters();
+    renderStudents();
+    renderRentals();
+    saveState();
+}
+
+// Upravljanje načina za izbiro več učencev
+function toggleSelectionMode() {
+    state.isSelectionMode = !state.isSelectionMode;
+    state.multiSelectedStudents = []; // Reset izbire
+    state.selectedCharId = null;
+    state.selectedStudentName = null;
+
+    const btn = document.getElementById('toggle-mode');
+    const randomBtn = document.getElementById('random-btn');
+
+    if (state.isSelectionMode) {
+        btn.innerText = "PREKLIČI IZBIRANJE";
+        btn.classList.add('active');
+        randomBtn.style.display = "block";
+        // Animacija za gumb
+        randomBtn.style.animation = "popIn 0.3s ease";
+    } else {
+        btn.innerText = "NAČIN: IZBERI UČENCE";
+        btn.classList.remove('active');
+        randomBtn.style.display = "none";
+    }
+    render();
+}
+
+function renderCharacters() {
+    const el = document.getElementById('char-list');
+    el.innerHTML = '';
+    state.availableChars.forEach(char => {
+        const card = document.createElement('div');
+        card.className = `card ${state.selectedCharId === char.id ? 'selected' : ''} ${state.isSelectionMode ? 'disabled' : ''}`;
+        card.onclick = () => {
+            if (state.isSelectionMode) return; // Onemogoči klikanje figuric med skupinsko izbiro
+            state.selectedCharId = (state.selectedCharId === char.id) ? null : char.id;
+            render();
+            checkPairing();
+        };
+        card.innerHTML = `<img src="${char.img}" ${IMG_FALLBACK_ATTR}><span class="card-name">${char.name}</span>`;
+        el.appendChild(card);
+    });
+}
+
+function renderStudents() {
+    const el = document.getElementById('student-list');
+    el.innerHTML = '';
+    // Slovensko abecedno razvrščanje (č, š, ž na pravem mestu)
+    state.availableStudents.sort((a, b) => a.localeCompare(b, 'sl')).forEach(name => {
+        const card = document.createElement('div');
+        const isHighlighted = state.multiSelectedStudents.includes(name);
+        const isSelected = state.selectedStudentName === name;
+
+        // Doda razred 'highlight' če je v skupini, 'selected' če je posamično
+        card.className = `card ${isHighlighted ? 'highlight' : ''} ${isSelected ? 'selected' : ''}`;
+
+        card.onclick = () => {
+            if (state.isSelectionMode) {
+                // Logika za večkratno izbiro (toggle)
+                if (state.multiSelectedStudents.includes(name)) {
+                    state.multiSelectedStudents = state.multiSelectedStudents.filter(s => s !== name);
+                } else {
+                    state.multiSelectedStudents.push(name);
+                }
+            } else {
+                // Logika za posamično izbiro
+                state.selectedStudentName = (state.selectedStudentName === name) ? null : name;
+            }
+            render();
+            if (!state.isSelectionMode) checkPairing();
+        };
+        card.innerHTML = `<span class="card-name">${name}</span>`;
+        el.appendChild(card);
+    });
+}
+
+// Pravično naključno mešanje (Fisher–Yates)
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function makeEndTime() {
+    return new Date(Date.now() + RENTAL_TIME_MINUTES * 60 * 1000);
+}
+
+function makeRentalId() {
+    return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+// Logika za naključno parčkanje (Gumb: Figurice Izbirajo)
+function randomPairing() {
+    if (state.multiSelectedStudents.length === 0) {
+        alert("Najprej označi učence (pobarvaj jih rumeno)!");
+        return;
+    }
+    if (state.availableChars.length < state.multiSelectedStudents.length) {
+        alert(`Ni dovolj prostih figuric za vse izbrane učence! (prostih: ${state.availableChars.length}, izbranih: ${state.multiSelectedStudents.length})`);
+        return;
+    }
+
+    // Naključno premešaj figurice
+    const shuffledChars = shuffle(state.availableChars);
+
+    state.multiSelectedStudents.forEach(studentName => {
+        const char = shuffledChars.pop();
+        const id = makeRentalId();
+        newRentalIds.add(id);
+
+        // Dodaj na začetek seznama (unshift), da bo na vrhu
+        state.rentals.unshift({ id, char, student: studentName, endTime: makeEndTime() });
+
+        // Odstrani iz bazena
+        state.availableChars = state.availableChars.filter(c => c.id !== char.id);
+        state.availableStudents = state.availableStudents.filter(s => s !== studentName);
+    });
+
+    toggleSelectionMode(); // Zapri način izbiranja (počisti izbor in izriše)
+}
+
+function renderRentals() {
+    const el = document.getElementById('rental-list');
+    const count = state.rentals.length;
+
+    // Določanje razreda za mrežo (grid) glede na število aktivnih
+    el.className = count <= 2 ? 'grid-1' : (count <= 4 ? 'grid-2' : 'grid-3');
+    el.innerHTML = count === 0 ? '<div class="empty-msg">Nihče se še ne igra. Izberi par!</div>' : '';
+
+    state.rentals.forEach((rental) => {
+        const div = document.createElement('div');
+        const remains = secondsLeft(rental);
+        div.className = `rental-pair ${newRentalIds.has(rental.id) ? 'new' : ''} ${remains <= 0 ? 'expired' : ''}`;
+        div.innerHTML = `
+            <div class="rental-img-container">
+                <img src="${rental.char.img}" class="rental-img" ${IMG_FALLBACK_ATTR}>
+            </div>
+            <div class="rental-details">
+                <div class="rental-student">${rental.student}</div>
+                <div class="rental-char">${rental.char.name}</div>
+                <div data-timer="${rental.id}" class="timer-display ${remains < 60 ? 'low-time' : ''}">${formatTime(remains)}</div>
+                <button class="return-btn" onclick="returnChar('${rental.id}')">VRNI</button>
+            </div>`;
+        el.appendChild(div);
+    });
+    newRentalIds.clear();
+}
+
+// Posamično parčkanje (ročno: klik figurice + klik učenca)
+function checkPairing() {
+    if (state.selectedCharId && state.selectedStudentName) {
+        const char = state.availableChars.find(c => c.id === state.selectedCharId);
+        if (!char) return;
+        const id = makeRentalId();
+        newRentalIds.add(id);
+
+        state.rentals.unshift({ id, char, student: state.selectedStudentName, endTime: makeEndTime() });
+
+        state.availableChars = state.availableChars.filter(c => c.id !== state.selectedCharId);
+        state.availableStudents = state.availableStudents.filter(s => s !== state.selectedStudentName);
+
+        state.selectedCharId = null;
+        state.selectedStudentName = null;
+        render();
+    }
+}
+
+// Figurice se vrnejo v prvotnem vrstnem redu
+function sortChars() {
+    state.availableChars.sort((a, b) =>
+        characters.findIndex(c => c.id === a.id) - characters.findIndex(c => c.id === b.id));
+}
+
+function returnChar(id) {
+    const r = state.rentals.find(r => String(r.id) === String(id));
+    if (!r) return;
+    state.availableChars.push(r.char);
+    state.availableStudents.push(r.student);
+    state.rentals = state.rentals.filter(x => x !== r);
+    sortChars();
+    render();
+}
+
+function returnAll() {
+    if (state.rentals.length === 0) return;
+    if (confirm("Ali si prepričan, da želiš končati igro za vse učence?")) {
+        state.rentals.forEach(r => {
+            state.availableChars.push(r.char);
+            state.availableStudents.push(r.student);
+        });
+        state.rentals = [];
+        sortChars();
+        render();
+    }
+}
+
+function secondsLeft(rental) {
+    return Math.max(0, Math.floor((new Date(rental.endTime) - new Date()) / 1000));
+}
+
+function formatTime(sec) {
+    if (sec <= 0) return "KONEC!";
+    return `${Math.floor(sec / 60)}:${(sec % 60).toString().padStart(2, '0')}`;
+}
+
+// --- PAMETNI INTERVAL (Osveži samo tekst, ne slik) ---
+setInterval(() => {
+    state.rentals.forEach((rental) => {
+        const timerEl = document.querySelector(`[data-timer="${rental.id}"]`);
+        if (!timerEl) return;
+        const remains = secondsLeft(rental);
+        timerEl.innerText = formatTime(remains);
+        timerEl.classList.toggle('low-time', remains < 60);
+        // Obarvaj rob rdeče, ko je konec
+        timerEl.closest('.rental-pair').classList.toggle('expired', remains <= 0);
+    });
+}, 1000);
+
+// --- SHRANJEVANJE V POMNILNIK BRSKALNIKA ---
+function saveState() {
+    try {
+        localStorage.setItem('legoState', JSON.stringify({
+            availableChars: state.availableChars,
+            availableStudents: state.availableStudents,
+            rentals: state.rentals
+        }));
+    } catch (e) { /* npr. zasebno okno – igra deluje tudi brez shranjevanja */ }
+}
+
+// Naloži ob zagonu (samo, če shranjeno stanje še ustreza trenutnim seznamom)
+function loadState() {
+    try {
+        const saved = localStorage.getItem('legoState');
+        if (!saved) return;
+        const parsed = JSON.parse(saved);
+        const rentals = (parsed.rentals || []).map(r => ({ ...r, id: String(r.id) }));
+
+        // Uporabi trenutne podatke o figuricah (če se je spremenilo ime ali slika)
+        const byId = Object.fromEntries(characters.map(c => [c.id, c]));
+        const validRentals = rentals.filter(r => r.char && byId[r.char.id] && studentNames.includes(r.student));
+        validRentals.forEach(r => { r.char = byId[r.char.id]; });
+
+        const rentedCharIds = new Set(validRentals.map(r => r.char.id));
+        const rentedStudents = new Set(validRentals.map(r => r.student));
+
+        state.rentals = validRentals;
+        state.availableChars = characters.filter(c => !rentedCharIds.has(c.id));
+        state.availableStudents = studentNames.filter(s => !rentedStudents.has(s));
+    } catch (e) { /* pokvarjeno shranjeno stanje – začni znova */ }
+}
+
+loadState();
+// Začetni izris
+render();
+</script>
+</body>
+</html>
