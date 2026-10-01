@@ -470,7 +470,8 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
     </div>
 </dialog>
 
-<input type="file" id="photo-input" accept="image/*" capture="environment" hidden>
+<!-- brez "capture": telefon ponudi kamero ali galerijo; "multiple" za več slik iz galerije -->
+<input type="file" id="photo-input" accept="image/*" multiple hidden>
 <div class="toast" id="toast" role="status"></div>
 
 <dialog id="name-dialog">
@@ -708,14 +709,19 @@ function toast(msg, ms = 2600) {
 let products = [];            // [{ id, created_at }] najnovejši najprej
 const productImages = {};     // id -> data URL
 
+let productsLoadSeq = 0;
 async function loadProducts() {
+    // Odgovor starejšega klica (npr. rednega preverjanja) ne sme prepisati novejšega
+    const seq = ++productsLoadSeq;
     const list = await rpc('seznam');
+    if (seq !== productsLoadSeq) return;
     if (!Array.isArray(list)) return; // baza nedosegljiva ali SQL še ni zagnan
     const missing = list.map(p => p.id).filter(id => !productImages[id]);
     for (let i = 0; i < missing.length; i += 10) {
         const rows = await rpc('slike', { p_ids: missing.slice(i, i + 10) });
         (Array.isArray(rows) ? rows : []).forEach(r => { productImages[r.id] = r.image; });
     }
+    if (seq !== productsLoadSeq) return;
     const next = list.filter(p => productImages[p.id]);
     // Trak na novo izrišemo samo, če se je kaj spremenilo
     if (next.map(p => p.id).join() !== products.map(p => p.id).join()) {
@@ -813,22 +819,30 @@ function startPhoto() {
 }
 
 $('photo-input').addEventListener('change', async () => {
-    const file = $('photo-input').files[0];
+    const files = [...$('photo-input').files];
     const t = teacher();
-    if (!file || !t) return;
-    toast('Nalagam izdelek …', 20000);
-    let data;
-    try { data = await prepareImage(file); }
-    catch (e) { toast('Slike ni bilo mogoče prebrati.'); return; }
-    const id = await rpc('dodaj', { p_teacher: t.id, p_image: data });
-    if (!id) {
-        toast('Nalaganje ni uspelo. Poskusi znova ali se ponovno prijavi.', 4000);
-        forgetTeacher();
-        return;
+    if (files.length === 0 || !t) return;
+    let added = 0, failed = 0;
+    for (const [i, file] of files.entries()) {
+        toast(files.length > 1 ? `Nalagam izdelek ${i + 1} / ${files.length} …` : 'Nalagam izdelek …', 60000);
+        let data;
+        try { data = await prepareImage(file); }
+        catch (e) { failed++; continue; }
+        const id = await rpc('dodaj', { p_teacher: t.id, p_image: data });
+        if (!id) {
+            // Najverjetneje prijava ni več veljavna – ostalih ne poskušamo
+            toast('Nalaganje ni uspelo. Poskusi znova ali se ponovno prijavi.', 4000);
+            forgetTeacher();
+            if (added) await loadProducts();
+            return;
+        }
+        productImages[id] = data;
+        added++;
     }
-    productImages[id] = data;
     await loadProducts();
-    toast('Izdelek dodan ✓');
+    if (added === 0) toast('Slike ni bilo mogoče prebrati.');
+    else toast((added === 1 ? 'Izdelek dodan ✓' : `Dodanih izdelkov: ${added} ✓`)
+        + (failed ? ` (${failed} slik ni bilo mogoče prebrati)` : ''), 3500);
 });
 
 function loadImage(file) {
