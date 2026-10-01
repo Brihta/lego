@@ -4,298 +4,499 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Svet Lego junakov</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-    --lego-yellow: #FFD700;
-    --lego-red: #D11013;
-    --lego-blue: #0055BF;
-    --lego-green: #228B22;
-    --bg-color: #f4f4f4;
-    --stud-color: #e0e0e0; /* Barva za krogce v ozadju */
+    --yellow: #FFCF00;
+    --red: #E3000B;
+    --orange: #F7861E;
+    --orange-dark: #D96D0A;
+    --blue: #006CB7;
+    --ink: #1B1B1F;
+    --muted: #6B6B73;
+    --line: #E6E6EA;
+    --bg: #FFFFFF;
+    --panel: #F6F6F8;
+    --tile: #F2F2F4;
+    --radius: 16px;
 }
 
+* { box-sizing: border-box; }
+
 body {
-    font-family: 'Fredoka', 'Segoe UI', sans-serif;
     margin: 0;
-    padding: 0;
-    /* Lego ozadje s čepki */
-    background-color: var(--bg-color);
-    background-image: radial-gradient(var(--stud-color) 15%, transparent 16%), radial-gradient(var(--stud-color) 15%, transparent 16%);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    color: #333;
     overflow: hidden;
+    font-family: 'Outfit', 'Segoe UI', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
 }
+
+button { font-family: inherit; cursor: pointer; }
 
 /* --- GLAVA --- */
 header {
-    background-color: var(--lego-red);
-    color: white;
-    text-align: center;
-    padding: 15px;
-    font-size: 32px;
-    font-weight: 700;
-    box-shadow: 0 6px 0 #8b0a0d;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-    z-index: 10;
-    position: relative;
-}
-
-/* --- GLAVNA RAZPOREDITEV --- */
-.main-container {
+    background: var(--yellow);
     display: flex;
-    flex: 1;
-    overflow: hidden; /* Prepreči drsenje celotne strani */
-}
-
-.column {
-    padding: 15px;
-    overflow-y: auto; /* Vsak stolpec drsi posebej */
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 18px;
+    padding: 14px 28px;
+    flex-shrink: 0;
 }
-
-/* Specifične širine in ozadja stolpcev */
-#char-pool { width: 30%; background-color: rgba(232, 232, 232, 0.9); border-right: 4px solid #ccc; }
-#active-zone { width: 40%; background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px); }
-#student-pool { width: 30%; background-color: rgba(232, 232, 232, 0.9); border-left: 4px solid #ccc; }
-
-h2 {
-    font-size: 1.2rem;
-    background: var(--lego-blue);
-    color: white;
-    padding: 8px 25px;
-    border-radius: 30px;
-    margin-bottom: 20px;
-    text-align: center;
-    box-shadow: 0 4px 0 #003a82;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-/* --- GUMBI --- */
-.btn {
-    border: none;
-    padding: 12px 15px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.1s;
-    width: 90%;
-    text-align: center;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    font-family: 'Fredoka', sans-serif;
-    position: relative;
-}
-.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.2) !important; }
-.btn:hover { filter: brightness(1.1); }
-
-.return-all-btn { background-color: var(--lego-yellow); color: #333; box-shadow: 0 4px 0 #b89b00; }
-
-.mode-btn { background-color: var(--lego-blue); color: white; box-shadow: 0 4px 0 #003a82; }
-.mode-btn.active { background-color: var(--lego-red); box-shadow: 0 4px 0 #8b0a0d; animation: pulse 1s infinite; }
-
-.random-btn { background-color: var(--lego-yellow); color: #333; box-shadow: 0 4px 0 #b89b00; font-size: 1rem; border: 2px solid #fff; }
-
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-
-/* --- MREŽE ZA IZBIRO (Levo in Desno) --- */
-#char-list, #student-list {
+.logo {
+    width: 56px;
+    height: 56px;
+    background: var(--red);
+    border-radius: 6px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: 100%;
+    place-items: center;
+    box-shadow: inset 0 0 0 3px #fff, 0 0 0 2px var(--ink);
+    flex-shrink: 0;
 }
+.logo svg { width: 34px; height: 34px; }
+header h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+.header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.pill-btn {
+    border: 2px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 9px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .15s;
+}
+.pill-btn:hover { background: rgba(0,0,0,.08); }
+.pill-btn:disabled { opacity: .35; cursor: default; background: transparent; }
+.pill-btn.solid { background: var(--ink); color: #fff; }
+.pill-btn.solid:hover { background: #333; }
 
-.card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 0 #ddd;
-    cursor: pointer;
-    padding: 8px;
-    text-align: center;
-    border: 3px solid transparent;
+/* --- VRTILJAK FIGURIC --- */
+.carousel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 18px 28px 0;
+    background: var(--panel);
+}
+.carousel-head .hint { margin-left: auto; color: var(--muted); font-size: .95rem; }
+.carousel {
+    position: relative;
+    overflow: hidden;
+    background: var(--panel);
+    padding: 14px 0 22px;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+    /* mehak prehod na robovih */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+}
+.track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    padding: 0 7px;
+    will-change: transform;
+}
+.carousel.static { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+.carousel.static .track { padding: 0 28px; }
+
+.fig {
+    width: 150px;
+    flex-shrink: 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 8px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: transform 0.1s;
+    gap: 6px;
+    text-align: center;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
 }
-.card:active { transform: scale(0.95); }
-.card.selected { border-color: var(--lego-blue); background-color: #e6f0ff; transform: translateY(-2px); }
-/* Rumena obroba za večkratno izbiro */
-.card.highlight { background-color: #fff9c4; border-color: var(--lego-yellow); box-shadow: 0 4px 0 orange; transform: translateY(-2px); }
-/* Figurice so med skupinsko izbiro zatemnjene, ker jih ni mogoče klikniti */
-.card.disabled { opacity: 0.5; cursor: default; }
+.fig:hover { transform: translateY(-5px); box-shadow: 0 10px 22px rgba(0,0,0,.10); border-color: var(--yellow); }
+.fig:active { transform: scale(.96); }
+.fig img { width: 100%; height: 96px; object-fit: contain; mix-blend-mode: multiply; }
+.fig span { font-size: .9rem; font-weight: 600; line-height: 1.15; }
+.carousel-empty { padding: 40px 28px; color: var(--muted); font-size: 1.1rem; }
 
-.card img { width: 100%; height: 80px; object-fit: contain; }
-.card-name { font-weight: 600; font-size: 0.85rem; margin-top: 5px; line-height: 1.1; }
+/* --- IZDELKI (drugi trak) --- */
+.products-head { padding-top: 4px; }
+.carousel.products { padding: 10px 0 18px; }
+.prod {
+    width: 190px;
+    height: 140px;
+    flex-shrink: 0;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 8px;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.prod:hover { transform: translateY(-5px); box-shadow: 0 10px 22px rgba(0,0,0,.10); border-color: var(--yellow); }
+.prod img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+[hidden] { display: none !important; }
 
-/* --- SREDINA: AKTIVNE IZPOSOJE --- */
+/* --- OBVESTILO --- */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    z-index: 100;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* --- AKTIVNE IZPOSOJE --- */
+.stage { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+
+.section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 16px;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.section-title .count { font-size: 1rem; font-weight: 500; color: var(--muted); }
+.carousel-head .section-title { margin: 0; font-size: 1.35rem; }
+
 #rental-list {
     display: grid;
-    gap: 15px;
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    box-sizing: border-box;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(var(--card-min, 190px), 1fr));
 }
+/* Višina slike glede na zaslon, da kartice ne gredo čez rob */
+#rental-list.size-l { --card-min: 300px; --img-h: 20vh; grid-template-columns: repeat(auto-fill, minmax(300px, 380px)); }
+#rental-list.size-m { --card-min: 220px; --img-h: 17vh; }
+#rental-list.size-s { --card-min: 170px; --img-h: 12vh; }
 
-/* Razporeditev stolpcev glede na gnečo */
-#rental-list.grid-1 { grid-template-columns: 1fr; }
-#rental-list.grid-2 { grid-template-columns: repeat(2, 1fr); }
-#rental-list.grid-3 { grid-template-columns: repeat(3, 1fr); }
+@keyframes popIn { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
 
-/* Animacija prihoda nove kartice */
-@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } }
-
-.rental-pair {
-    display: grid;
-    /* KLJUČNO: Slika levo (40%), Tekst desno (60%) */
-    grid-template-columns: 40% 60%;
-    background: #fff;
-    border-radius: 15px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
-    border-left: 12px solid var(--lego-yellow);
-    overflow: hidden;
-    align-items: center;
-    padding: 10px;
+.card {
     position: relative;
-}
-/* Animacija samo za novo dodano kartico, ne ob vsakem izrisu */
-.rental-pair.new { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.rental-pair.expired { border-left-color: var(--lego-red); }
-
-.rental-img-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    background-color: #fafafa;
-    border-radius: 8px;
-    margin-right: 10px;
-    padding: 5px;
-    box-sizing: border-box;
-}
-.rental-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); }
-
-.rental-details {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    text-align: left; /* VSE PORAVNANO LEVO */
-    height: 100%;
-    padding-right: 5px;
-    min-width: 0;
 }
+.card.new { animation: popIn .4s cubic-bezier(.175,.885,.32,1.275); }
+.card.expired { border: 2px solid var(--red); }
 
-.rental-student { font-weight: 700; color: var(--lego-blue); line-height: 1.1; margin-bottom: 2px; }
-.rental-char { color: #666; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
+.card-img {
+    background: var(--tile);
+    border-radius: 12px;
+    height: var(--img-h, 20vh);
+    position: relative;
+    margin-bottom: 12px;
+}
+/* multiply: bela ozadja fotografij se zlijejo s sivo ploščico */
+.card-img img { position: absolute; inset: 10px; width: calc(100% - 20px); height: calc(100% - 20px); object-fit: contain; mix-blend-mode: multiply; }
 
-.timer-display {
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-    color: #333;
-    background: #eee;
-    padding: 4px 8px;
+.badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: .8rem;
+    padding: 3px 10px;
     border-radius: 6px;
-    width: fit-content;
-    margin-bottom: 8px;
-    border: 1px solid #ddd;
 }
-.timer-display.low-time { color: white; background-color: var(--lego-red); border-color: var(--lego-red); animation: blink 1s infinite; }
-@keyframes blink { 50% { opacity: 0.7; } }
+.card.expired .badge { background: var(--red); color: #fff; }
 
-.return-btn {
-    background-color: var(--lego-green);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
+.student { font-weight: 700; line-height: 1.1; font-size: 1.5rem; overflow-wrap: anywhere; }
+.char-name { color: var(--muted); font-size: 1rem; margin-top: 2px; }
+
+.card-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.timer {
     font-weight: 700;
-    width: fit-content;
-    box-shadow: 0 3px 0 #155a15;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    font-family: 'Fredoka', sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-size: 1.5rem;
+    letter-spacing: .02em;
 }
-.return-btn:hover { background-color: #2eb82e; }
-.return-btn:active { transform: translateY(2px); box-shadow: none; }
+.timer.low { color: var(--red); animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: .45; } }
+.return-btn {
+    margin-left: auto;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    border-radius: 999px;
+    padding: 9px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.return-btn:hover { background: var(--orange-dark); }
 
-/* --- DINAMIČNO PRILAGAJANJE VELIKOSTI --- */
-/* 1-2 izposoji: VELIKE KARTICE */
-.grid-1 .rental-pair { padding: 20px; height: 200px; }
-.grid-1 .rental-img { max-height: 180px; }
-.grid-1 .rental-student { font-size: 2.2rem; margin-bottom: 5px; }
-.grid-1 .rental-char { font-size: 1.3rem; margin-bottom: 15px; }
-.grid-1 .timer-display { font-size: 2.5rem; padding: 5px 15px; }
-.grid-1 .return-btn { font-size: 1.1rem; padding: 12px 25px; }
+/* Velike kartice, ko se igra le nekaj otrok */
+.size-l .student { font-size: 2rem; }
+.size-l .char-name { font-size: 1.2rem; }
+.size-l .timer { font-size: 2.1rem; }
+.size-l .return-btn { font-size: 1.15rem; padding: 12px 26px; }
+.size-s .student { font-size: 1.2rem; }
+.size-s .char-name { font-size: .85rem; }
+.size-s .timer { font-size: 1.2rem; }
+.size-s .return-btn { padding: 7px 14px; font-size: .9rem; }
 
-/* 3-4 izposoje: SREDNJE KARTICE */
-.grid-2 .rental-pair { padding: 10px; height: 140px; }
-.grid-2 .rental-img { max-height: 120px; }
-.grid-2 .rental-student { font-size: 1.4rem; }
-.grid-2 .rental-char { font-size: 0.9rem; }
-.grid-2 .timer-display { font-size: 1.6rem; }
-
-/* 5+ izposoj: MAJHNE KARTICE */
-.grid-3 .rental-pair { padding: 8px; height: 110px; grid-template-columns: 35% 65%; }
-.grid-3 .rental-img { max-height: 90px; }
-.grid-3 .rental-student { font-size: 1rem; }
-.grid-3 .rental-char { font-size: 0.75rem; margin-bottom: 4px; }
-.grid-3 .timer-display { font-size: 1.2rem; padding: 2px 5px; }
-.grid-3 .return-btn { padding: 4px 10px; font-size: 0.7rem; margin-top: 2px; }
-
-.empty-msg {
+.empty {
     grid-column: 1 / -1;
+    border: 2px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 60px 20px;
     text-align: center;
-    color: #999;
-    margin-top: 60px;
+    color: var(--muted);
+}
+.empty strong { display: block; color: var(--ink); font-size: 1.4rem; margin-bottom: 6px; }
+
+/* --- HITER VNOS IMENA --- */
+dialog {
+    border: none;
+    border-radius: 20px;
+    padding: 0;
+    width: min(420px, calc(100vw - 32px));
+    box-shadow: 0 24px 60px rgba(0,0,0,.25);
+    font-family: inherit;
+    color: var(--ink);
+}
+dialog[open] { animation: popIn .25s cubic-bezier(.175,.885,.32,1.275); }
+dialog::backdrop { background: rgba(27,27,31,.45); }
+.dlg-fig {
+    background: var(--tile);
+    height: 200px;
+    position: relative;
+}
+.dlg-fig img { position: absolute; inset: 14px; width: calc(100% - 28px); height: calc(100% - 28px); object-fit: contain; mix-blend-mode: multiply; }
+.dlg-body { padding: 18px 22px 22px; }
+.dlg-char { font-size: 1.5rem; font-weight: 700; margin: 0 0 12px; }
+.dlg-input {
+    width: 100%;
+    font: inherit;
     font-size: 1.3rem;
-    font-style: italic;
+    padding: 12px 18px;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    outline: none;
+}
+.dlg-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0,108,183,.25); }
+.dlg-actions { display: flex; gap: 10px; margin-top: 14px; }
+.dlg-actions .start {
+    flex: 1;
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    border-radius: 999px;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.dlg-actions .start:hover { background: var(--orange-dark); }
+.dlg-actions .cancel {
+    border: 2px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 12px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* --- OKNO Z VSEMI FIGURICAMI --- */
+#grid-dialog { width: min(1200px, calc(100vw - 48px)); max-height: calc(100vh - 48px); }
+.grid-head {
+    display: flex;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+}
+.grid-head h2 { margin: 0; font-size: 1.5rem; }
+.grid-head .close {
+    margin-left: auto;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    background: #fff;
+    font-size: 1.1rem;
+}
+.grid-head .close:hover { background: var(--tile); }
+#grid-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    padding: 18px 22px 22px;
+    background: var(--panel);
+}
+#grid-list .fig { width: auto; }
+#grid-list .fig img { height: 100px; }
+
+/* --- PRIJAVA --- */
+.login-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.login-body h2 { margin: 0; font-size: 1.4rem; }
+.login-body p { margin: 0; color: var(--muted); font-size: .95rem; }
+.login-msg { color: var(--red) !important; min-height: 1.2em; }
+
+/* --- POVEČAN IZDELEK --- */
+#photo-dialog { width: min(900px, calc(100vw - 32px)); }
+.photo-big { background: #fff; height: min(70vh, 640px); position: relative; }
+.photo-big img { position: absolute; inset: 16px; width: calc(100% - 32px); height: calc(100% - 32px); object-fit: contain; mix-blend-mode: multiply; }
+.photo-foot { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--line); }
+.photo-foot .date { color: var(--muted); }
+.photo-foot .del {
+    margin-left: auto;
+    border: 2px solid var(--red);
+    color: var(--red);
+    background: #fff;
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+.photo-foot .del:hover { background: #fdeceb; }
+.photo-foot .cancel { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 9px 18px; font-weight: 600; font-size: 1rem; }
+
+/* --- MANJŠI ZASLONI --- */
+@media (max-width: 820px) {
+    body { height: auto; overflow: auto; }
+    header { padding: 12px 16px; gap: 12px; flex-wrap: wrap; }
+    header h1 { font-size: 1.3rem; }
+    .logo { width: 44px; height: 44px; }
+    .header-actions { margin-left: 0; width: 100%; flex-wrap: wrap; gap: 8px; }
+    .pill-btn { padding: 8px 14px; font-size: .95rem; }
+    .carousel-head { padding: 16px 16px 0; }
+    .carousel-head .hint { display: none; }
+    .fig { width: 120px; }
+    .fig img { height: 86px; }
+    .stage { overflow: visible; padding: 22px 16px 40px; }
 }
 </style>
 </head>
 <body>
 
-<header>🧱 Svet Lego junakov</header>
-
-<div class="main-container">
-    <div class="column" id="char-pool">
-        <h2>Figurice</h2>
-        <button class="btn return-all-btn" onclick="returnAll()">VRNI VSE ↺</button>
-        <div id="char-list"></div>
+<header>
+    <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><rect x="4" y="14" width="32" height="20" rx="3" fill="#fff"/><rect x="8" y="8" width="9" height="7" rx="2" fill="#fff"/><rect x="23" y="8" width="9" height="7" rx="2" fill="#fff"/></svg>
     </div>
-
-    <div class="column" id="active-zone">
-        <div id="rental-list"></div>
+    <h1>Svet Lego junakov</h1>
+    <div class="header-actions">
+        <button class="pill-btn solid" id="photo-btn" onclick="startPhoto()">📷 Dodaj izdelek</button>
+        <button class="pill-btn solid" id="grid-btn" onclick="openGrid()">▦ Vse figurice</button>
+        <button class="pill-btn solid" id="random-btn" onclick="openRandom()">🎲 Naključna figurica</button>
+        <button class="pill-btn" id="return-all" onclick="returnAll()">Vrni vse ↺</button>
     </div>
+</header>
 
-    <div class="column" id="student-pool">
-        <h2>Učenci</h2>
-        <button id="toggle-mode" class="btn mode-btn" onclick="toggleSelectionMode()">NAČIN: IZBERI UČENCE</button>
-        <button id="random-btn" class="btn random-btn" onclick="randomPairing()" style="display:none;">FIGURICE IZBIRAJO 🎲</button>
-        <div id="student-list"></div>
+<div class="carousel-head">
+    <h2 class="section-title">Figurice <span class="count" id="char-count"></span></h2>
+    <span class="hint">Z miško ustaviš trak · klikni figurico</span>
+</div>
+<div class="carousel" id="carousel">
+    <div class="track" id="track"></div>
+</div>
+
+<div id="products-section" hidden>
+    <div class="carousel-head products-head">
+        <h2 class="section-title">Naši izdelki <span class="count" id="prod-count"></span></h2>
+    </div>
+    <div class="carousel products" id="prod-carousel">
+        <div class="track" id="prod-track"></div>
     </div>
 </div>
+
+<section class="stage">
+    <h2 class="section-title">Igra se zdaj <span class="count" id="rental-count"></span></h2>
+    <div id="rental-list"></div>
+</section>
+
+<dialog id="grid-dialog">
+    <div class="grid-head">
+        <h2>Izberi figurico</h2>
+        <button type="button" class="close" id="grid-close" title="Zapri">✕</button>
+    </div>
+    <div id="grid-list"></div>
+</dialog>
+
+<dialog id="login-dialog">
+    <form class="login-body" id="login-form">
+        <h2>Prijava za učitelje</h2>
+        <p>Enak e-naslov in geslo kot pri Brihta-MAT. Prijaviš se samo enkrat na tej napravi.</p>
+        <input class="dlg-input" id="login-email" type="email" autocomplete="username" placeholder="E-naslov" required>
+        <input class="dlg-input" id="login-pass" type="password" autocomplete="current-password" placeholder="Geslo" required>
+        <p class="login-msg" id="login-msg"></p>
+        <div class="dlg-actions">
+            <button type="button" class="cancel" id="login-cancel">Prekliči</button>
+            <button type="submit" class="start" id="login-submit">Prijava</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="photo-dialog">
+    <div class="photo-big"><img id="photo-img" alt="Izdelek"></div>
+    <div class="photo-foot">
+        <span class="date" id="photo-date"></span>
+        <button type="button" class="del" id="photo-del">Izbriši</button>
+        <button type="button" class="cancel" id="photo-close">Zapri</button>
+    </div>
+</dialog>
+
+<input type="file" id="photo-input" accept="image/*" capture="environment" hidden>
+<div class="toast" id="toast" role="status"></div>
+
+<dialog id="name-dialog">
+    <form method="dialog" id="name-form">
+        <div class="dlg-fig"><img id="dlg-img" alt=""></div>
+        <div class="dlg-body">
+            <p class="dlg-char" id="dlg-char"></p>
+            <input class="dlg-input" id="dlg-input" list="known-names" autocomplete="off" placeholder="Ime učenca" required>
+            <datalist id="known-names"></datalist>
+            <div class="dlg-actions">
+                <button type="button" class="cancel" id="dlg-cancel">Prekliči</button>
+                <button type="submit" class="start">Začni igro ▶</button>
+            </div>
+        </div>
+    </form>
+</dialog>
 
 <script>
 // --- KONFIGURACIJA PODATKOV ---
 // Slike so v mapi "figurice" poleg te datoteke; ime figurice = ime datoteke.
 const characterNames = [
-    "24", "Agent Simon", "Agent Vasja", "Bradač", "Dirkač Leo", "Gabi", "Jošt Kapičar",
+    "Agent Simon", "Agent Vasja", "Bradač", "Dirkač Leo", "Gabi", "Jošt Kapičar",
     "Kockasti Zombi", "Kopač Jože", "Krotilec zmajev", "Leopold pametnjakovič", "Lovilec zmajev",
     "Nejc", "Nika", "Pero", "Pika", "Policist Marko", "Policist Peter", "Raziskovalec Robi",
-    "Rdeči dirkač", "Robotek Rogatež", "Sončica Maša", "Strela", "Suljko", "Čeden Miki", "Črni napadalec"
+    "Rdeči dirkač", "Robotek Rogatež", "Robotko kvadratnik", "Sončica Maša", "Strela", "Suljko",
+    "Čeden Miki", "Črni napadalec"
 ];
 const characters = characterNames.map(name => ({
     id: name,
@@ -303,242 +504,464 @@ const characters = characterNames.map(name => ({
     img: encodeURI(`figurice/${name}.png`) // presledki in šumniki v URL-ju
 }));
 
-const studentNames = ["Vito", "Enej", "Ajan", "Amelia", "Sofija", "Sofia", "Iva", "Oto", "Ines", "Nina", "Maja", "Lucjan", "Adrian", "Jan", "Lia", "Maks", "Kaja", "Ula", "Rok", "Manca", "Bibi", "Lina"];
-
 const RENTAL_TIME_MINUTES = 15;
+const MAX_KNOWN_NAMES = 60;
+const CAROUSEL_SPEED = 45; // slikovnih pik na sekundo
 
 // Nadomestna slika (rumena Lego kocka), če slike figurice ni mogoče naložiti
 const FALLBACK_IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">' +
-    '<rect x="14" y="8" width="12" height="8" rx="2" fill="#e6c200"/>' +
-    '<rect x="34" y="8" width="12" height="8" rx="2" fill="#e6c200"/>' +
-    '<rect x="8" y="14" width="44" height="38" rx="4" fill="#FFD700"/>' +
+    '<rect x="14" y="8" width="12" height="8" rx="2" fill="#e6b800"/>' +
+    '<rect x="34" y="8" width="12" height="8" rx="2" fill="#e6b800"/>' +
+    '<rect x="8" y="14" width="44" height="38" rx="4" fill="#FFCF00"/>' +
     '<text x="30" y="41" font-size="22" text-anchor="middle" fill="#8a7400" font-family="sans-serif" font-weight="bold">?</text>' +
     '</svg>');
 
-// Brez neskončne zanke: onerror se odstrani pred zamenjavo slike
-const IMG_FALLBACK_ATTR = `onerror="this.onerror=null;this.src='${FALLBACK_IMG}'"`;
-
 // --- STANJE APLIKACIJE ---
-let state = {
-    availableChars: [...characters],
-    availableStudents: [...studentNames],
-    rentals: [],
-    selectedCharId: null,
-    selectedStudentName: null,
-    multiSelectedStudents: [],
-    isSelectionMode: false
-};
-
-// ID-ji kartic, ki so bile ravnokar dodane (za animacijo)
+let state = { rentals: [] };   // [{ id, char, student, endTime }]
+let knownNames = [];           // prej vpisana imena (za samodejno dopolnjevanje)
 let newRentalIds = new Set();
+let pendingChar = null;        // figurica, za katero vpisujemo ime
 
-// --- FUNKCIJE ZA IZRIS (RENDER) ---
-function render() {
-    renderCharacters();
-    renderStudents();
-    renderRentals();
-    saveState();
+const $ = id => document.getElementById(id);
+
+function makeId(prefix) {
+    return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-// Upravljanje načina za izbiro več učencev
-function toggleSelectionMode() {
-    state.isSelectionMode = !state.isSelectionMode;
-    state.multiSelectedStudents = []; // Reset izbire
-    state.selectedCharId = null;
-    state.selectedStudentName = null;
+function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text != null) e.textContent = text; // textContent: vpisana imena so varna
+    return e;
+}
 
-    const btn = document.getElementById('toggle-mode');
-    const randomBtn = document.getElementById('random-btn');
+function setImg(img, src) {
+    img.onerror = () => { img.onerror = null; img.src = FALLBACK_IMG; };
+    img.src = src;
+    return img;
+}
 
-    if (state.isSelectionMode) {
-        btn.innerText = "PREKLIČI IZBIRANJE";
-        btn.classList.add('active');
-        randomBtn.style.display = "block";
-        // Animacija za gumb
-        randomBtn.style.animation = "popIn 0.3s ease";
-    } else {
-        btn.innerText = "NAČIN: IZBERI UČENCE";
-        btn.classList.remove('active');
-        randomBtn.style.display = "none";
+function availableChars() {
+    const rented = new Set(state.rentals.map(r => r.char.id));
+    return characters.filter(c => !rented.has(c.id));
+}
+
+// --- VRTILJAK ---
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Trak, ki se neskončno vrti; dir = 1 (od leve proti desni) ali -1
+function makeCarousel(box, track, dir) {
+    const c = { offset: 0, setWidth: 0, hovering: false };
+    box.addEventListener('mouseenter', () => { c.hovering = true; });
+    box.addEventListener('mouseleave', () => { c.hovering = false; });
+
+    c.fill = (items, makeCard, emptyText) => {
+        track.innerHTML = '';
+        if (items.length === 0) {
+            c.setWidth = 0;
+            if (emptyText) track.appendChild(el('div', 'carousel-empty', emptyText));
+            return;
+        }
+        items.forEach(it => track.appendChild(makeCard(it)));
+        if (reduceMotion) { box.classList.add('static'); return; }
+
+        // Širina enega kompleta (vključno z razmikom), nato toliko kopij, da trak vedno pokrije zaslon
+        const cs = getComputedStyle(track);
+        const gap = parseFloat(cs.columnGap) || 0;
+        c.setWidth = track.scrollWidth - parseFloat(cs.paddingLeft) * 2 + gap;
+        const copies = Math.ceil(box.clientWidth / c.setWidth) + 1;
+        for (let i = 0; i < copies; i++) items.forEach(it => track.appendChild(makeCard(it)));
+        c.offset %= c.setWidth;
+    };
+
+    c.step = (dt, paused) => {
+        if (c.setWidth > 0 && !paused && !c.hovering && !reduceMotion)
+            c.offset = (c.offset + CAROUSEL_SPEED * dt) % c.setWidth;
+        track.style.transform = c.setWidth > 0 && !reduceMotion
+            ? `translateX(${dir > 0 ? c.offset - c.setWidth : -c.offset}px)` : '';
+    };
+    return c;
+}
+
+const figCarousel = makeCarousel($('carousel'), $('track'), 1);
+const prodCarousel = makeCarousel($('prod-carousel'), $('prod-track'), -1);
+
+function figCard(char, onPick = openDialog) {
+    const card = el('button', 'fig');
+    card.type = 'button';
+    card.onclick = () => onPick(char);
+    const img = el('img');
+    img.alt = '';
+    card.append(setImg(img, char.img), el('span', null, char.name));
+    return card;
+}
+
+function renderCarousel() {
+    const free = availableChars();
+    $('char-count').textContent = `${free.length} / ${characters.length} prostih`;
+    figCarousel.fill(free, c => figCard(c), 'Vse figurice so izposojene. 🎉');
+}
+
+let lastTime = null;
+function tick(t) {
+    const dt = lastTime == null ? 0 : (t - lastTime) / 1000;
+    lastTime = t;
+    const dialogOpen = [...document.querySelectorAll('dialog')].some(d => d.open);
+    figCarousel.step(dt, dialogOpen);
+    prodCarousel.step(dt, dialogOpen);
+    requestAnimationFrame(tick);
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { renderCarousel(); renderProducts(); }, 150);
+});
+
+// --- HITER VNOS IMENA ---
+function openDialog(char) {
+    pendingChar = char;
+    setImg($('dlg-img'), char.img);
+    $('dlg-char').textContent = char.name;
+    $('dlg-input').value = '';
+    $('name-dialog').showModal();
+    $('dlg-input').focus();
+}
+
+// Vse proste figurice naenkrat – za hitro izposojo točno določene figurice
+function openGrid() {
+    const list = $('grid-list');
+    list.innerHTML = '';
+    availableChars().forEach(c => list.appendChild(figCard(c, char => {
+        $('grid-dialog').close();
+        openDialog(char);
+    })));
+    $('grid-dialog').showModal();
+    $('grid-close').focus();
+}
+$('grid-close').onclick = () => $('grid-dialog').close();
+$('grid-dialog').addEventListener('click', e => { if (e.target === $('grid-dialog')) $('grid-dialog').close(); });
+
+function openRandom() {
+    const free = availableChars();
+    if (free.length === 0) { alert('Vse figurice so izposojene.'); return; }
+    openDialog(free[Math.floor(Math.random() * free.length)]);
+}
+
+function cleanName(raw) {
+    const s = raw.trim().replace(/\s+/g, ' ');
+    return s ? s.charAt(0).toLocaleUpperCase('sl') + s.slice(1) : '';
+}
+
+$('name-form').addEventListener('submit', e => {
+    const name = cleanName($('dlg-input').value);
+    if (!name || !pendingChar) { e.preventDefault(); $('dlg-input').focus(); return; }
+    startRental(name, pendingChar);
+    pendingChar = null;
+});
+$('dlg-cancel').onclick = () => $('name-dialog').close();
+// Klik na temno ozadje zapre okno
+$('name-dialog').addEventListener('click', e => { if (e.target === $('name-dialog')) $('name-dialog').close(); });
+$('name-dialog').addEventListener('close', () => { pendingChar = null; });
+
+function rememberName(name) {
+    knownNames = [name, ...knownNames.filter(n => n.toLocaleLowerCase('sl') !== name.toLocaleLowerCase('sl'))]
+        .slice(0, MAX_KNOWN_NAMES);
+}
+
+// --- SUPABASE (isti projekt kot Brihta-MAT, ločene tabele "lego_") ---
+const SUPABASE_URL = 'https://ldczgbajbarlgwqzcggh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_888IYcEb-nSmGO0d67hEwA_rBFuXnv8';
+const PRODUCTS_POLL_MS = 20000;
+const LEGO_TEACHER_KEY = 'legoTeacher';
+const MAT_TEACHER_KEY = 'brihta_teacher_v1'; // prijava v Brihta-MAT na isti domeni
+
+async function rpc(fn, params) {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+            method: 'POST',
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization: `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params || {})
+        });
+        if (!res.ok) return null;
+        const txt = await res.text();
+        return txt ? JSON.parse(txt) : null;
+    } catch (e) { return null; }
+}
+
+function toast(msg, ms = 2600) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// --- IZDELKI ---
+let products = [];            // [{ id, created_at }] najnovejši najprej
+const productImages = {};     // id -> data URL
+
+async function loadProducts() {
+    const list = await rpc('lego_seznam');
+    if (!Array.isArray(list)) return; // baza nedosegljiva ali SQL še ni zagnan
+    const missing = list.map(p => p.id).filter(id => !productImages[id]);
+    for (let i = 0; i < missing.length; i += 10) {
+        const rows = await rpc('lego_slike', { p_ids: missing.slice(i, i + 10) });
+        (Array.isArray(rows) ? rows : []).forEach(r => { productImages[r.id] = r.image; });
     }
+    const next = list.filter(p => productImages[p.id]);
+    // Trak na novo izrišemo samo, če se je kaj spremenilo
+    if (next.map(p => p.id).join() !== products.map(p => p.id).join()) {
+        products = next;
+        renderProducts();
+    }
+}
+
+function prodCard(p) {
+    const card = el('button', 'prod');
+    card.type = 'button';
+    card.onclick = () => openPhoto(p);
+    const img = el('img');
+    img.alt = 'Izdelek';
+    img.src = productImages[p.id];
+    card.appendChild(img);
+    return card;
+}
+
+function renderProducts() {
+    $('products-section').hidden = products.length === 0;
+    $('prod-count').textContent = products.length ? `${products.length}` : '';
+    if (products.length) prodCarousel.fill(products, prodCard);
+}
+
+let openProduct = null;
+function openPhoto(p) {
+    openProduct = p;
+    $('photo-img').src = productImages[p.id];
+    $('photo-date').textContent = 'Dodano ' + new Date(p.created_at).toLocaleDateString('sl-SI');
+    $('photo-del').hidden = !teacher();
+    $('photo-dialog').showModal();
+}
+$('photo-close').onclick = () => $('photo-dialog').close();
+$('photo-dialog').addEventListener('click', e => { if (e.target === $('photo-dialog')) $('photo-dialog').close(); });
+$('photo-del').onclick = async () => {
+    const p = openProduct;
+    const t = teacher();
+    if (!p || !t || !confirm('Izbrišem ta izdelek s strani?')) return;
+    const ok = await rpc('lego_izbrisi', { p_teacher: t.id, p_id: p.id });
+    if (ok !== true) { toast('Brisanje ni uspelo.'); return; }
+    $('photo-dialog').close();
+    products = products.filter(x => x.id !== p.id);
+    delete productImages[p.id];
+    renderProducts();
+    toast('Izdelek izbrisan.');
+};
+
+// --- PRIJAVA UČITELJA ---
+function teacher() {
+    for (const key of [LEGO_TEACHER_KEY, MAT_TEACHER_KEY]) {
+        try {
+            const t = JSON.parse(localStorage.getItem(key));
+            if (t && t.id) return t;
+        } catch (e) { /* ni shranjene prijave */ }
+    }
+    return null;
+}
+
+function forgetTeacher() {
+    try { localStorage.removeItem(LEGO_TEACHER_KEY); } catch (e) {}
+}
+
+$('login-cancel').onclick = () => $('login-dialog').close();
+$('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('login-msg');
+    msg.textContent = '';
+    $('login-submit').disabled = true;
+    const rows = await rpc('login_teacher_email', {
+        p_email: $('login-email').value.toLowerCase().trim(),
+        p_password: $('login-pass').value
+    });
+    $('login-submit').disabled = false;
+    if (!Array.isArray(rows) || rows.length === 0) { msg.textContent = 'Napačen e-naslov ali geslo.'; return; }
+    if (!rows[0].approved) { msg.textContent = 'Račun še ni potrjen.'; return; }
+    try {
+        localStorage.setItem(LEGO_TEACHER_KEY, JSON.stringify({ id: rows[0].id, username: rows[0].username }));
+    } catch (err) { msg.textContent = 'Brskalnik ne dovoli shranjevanja prijave.'; return; }
+    $('login-pass').value = '';
+    $('login-dialog').close();
+    toast('Prijavljen ✓ Zdaj pritisni 📷 in slikaj izdelek.', 3500);
+});
+
+// --- FOTOGRAFIRANJE IZDELKA ---
+function startPhoto() {
+    if (!teacher()) {
+        $('login-msg').textContent = '';
+        $('login-dialog').showModal();
+        $('login-email').focus();
+        return;
+    }
+    $('photo-input').value = '';
+    $('photo-input').click();
+}
+
+$('photo-input').addEventListener('change', async () => {
+    const file = $('photo-input').files[0];
+    const t = teacher();
+    if (!file || !t) return;
+    toast('Nalagam izdelek …', 20000);
+    let data;
+    try { data = await prepareImage(file); }
+    catch (e) { toast('Slike ni bilo mogoče prebrati.'); return; }
+    const id = await rpc('lego_dodaj', { p_teacher: t.id, p_image: data });
+    if (!id) {
+        toast('Nalaganje ni uspelo. Poskusi znova ali se ponovno prijavi.', 4000);
+        forgetTeacher();
+        return;
+    }
+    productImages[id] = data;
+    await loadProducts();
+    toast('Izdelek dodan ✓');
+});
+
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('slika')); };
+        img.src = url;
+    });
+}
+
+// Pomanjša sliko in pobeli list: barvo papirja ob robu raztegne čez belo
+async function prepareImage(file) {
+    const img = await loadImage(file);
+    const MAX = 1000;
+    const scale = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const px = ctx.getImageData(0, 0, w, h);
+    const d = px.data;
+    // Mediana vsake barve v 5 % pasu ob robu = barva lista
+    const border = Math.max(2, Math.round(Math.min(w, h) * 0.05));
+    const samples = [[], [], []];
+    for (let y = 0; y < h; y += 3) {
+        for (let x = 0; x < w; x += 3) {
+            if (x >= border && x < w - border && y >= border && y < h - border) continue;
+            const i = (y * w + x) * 4;
+            samples[0].push(d[i]); samples[1].push(d[i + 1]); samples[2].push(d[i + 2]);
+        }
+    }
+    const gain = samples.map(arr => {
+        arr.sort((a, b) => a - b);
+        const paper = arr[Math.floor(arr.length / 2)] || 255;
+        // malo čez belo, da se tudi rahle sence na listu porežejo v čisto belo
+        return Math.min(2.4, Math.max(1, 268 / paper));
+    });
+    for (let i = 0; i < d.length; i += 4) {
+        d[i] = Math.min(255, d[i] * gain[0]);
+        d[i + 1] = Math.min(255, d[i + 1] * gain[1]);
+        d[i + 2] = Math.min(255, d[i + 2] * gain[2]);
+    }
+    ctx.putImageData(px, 0, 0);
+
+    let q = 0.82, out = canvas.toDataURL('image/jpeg', q);
+    while (out.length > 500000 && q > 0.5) { q -= 0.1; out = canvas.toDataURL('image/jpeg', q); }
+    return out;
+}
+
+// --- IZPOSOJE ---
+function startRental(student, char) {
+    if (state.rentals.some(r => r.char.id === char.id)) return;
+    const id = makeId('r');
+    newRentalIds.add(id);
+    state.rentals.unshift({
+        id, char, student,
+        endTime: new Date(Date.now() + RENTAL_TIME_MINUTES * 60 * 1000)
+    });
+    rememberName(student);
     render();
 }
 
-function renderCharacters() {
-    const el = document.getElementById('char-list');
-    el.innerHTML = '';
-    state.availableChars.forEach(char => {
-        const card = document.createElement('div');
-        card.className = `card ${state.selectedCharId === char.id ? 'selected' : ''} ${state.isSelectionMode ? 'disabled' : ''}`;
-        card.onclick = () => {
-            if (state.isSelectionMode) return; // Onemogoči klikanje figuric med skupinsko izbiro
-            state.selectedCharId = (state.selectedCharId === char.id) ? null : char.id;
-            render();
-            checkPairing();
-        };
-        card.innerHTML = `<img src="${char.img}" ${IMG_FALLBACK_ATTR}><span class="card-name">${char.name}</span>`;
-        el.appendChild(card);
-    });
-}
-
-function renderStudents() {
-    const el = document.getElementById('student-list');
-    el.innerHTML = '';
-    // Slovensko abecedno razvrščanje (č, š, ž na pravem mestu)
-    state.availableStudents.sort((a, b) => a.localeCompare(b, 'sl')).forEach(name => {
-        const card = document.createElement('div');
-        const isHighlighted = state.multiSelectedStudents.includes(name);
-        const isSelected = state.selectedStudentName === name;
-
-        // Doda razred 'highlight' če je v skupini, 'selected' če je posamično
-        card.className = `card ${isHighlighted ? 'highlight' : ''} ${isSelected ? 'selected' : ''}`;
-
-        card.onclick = () => {
-            if (state.isSelectionMode) {
-                // Logika za večkratno izbiro (toggle)
-                if (state.multiSelectedStudents.includes(name)) {
-                    state.multiSelectedStudents = state.multiSelectedStudents.filter(s => s !== name);
-                } else {
-                    state.multiSelectedStudents.push(name);
-                }
-            } else {
-                // Logika za posamično izbiro
-                state.selectedStudentName = (state.selectedStudentName === name) ? null : name;
-            }
-            render();
-            if (!state.isSelectionMode) checkPairing();
-        };
-        card.innerHTML = `<span class="card-name">${name}</span>`;
-        el.appendChild(card);
-    });
-}
-
-// Pravično naključno mešanje (Fisher–Yates)
-function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-function makeEndTime() {
-    return new Date(Date.now() + RENTAL_TIME_MINUTES * 60 * 1000);
-}
-
-function makeRentalId() {
-    return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
-// Logika za naključno parčkanje (Gumb: Figurice Izbirajo)
-function randomPairing() {
-    if (state.multiSelectedStudents.length === 0) {
-        alert("Najprej označi učence (pobarvaj jih rumeno)!");
-        return;
-    }
-    if (state.availableChars.length < state.multiSelectedStudents.length) {
-        alert(`Ni dovolj prostih figuric za vse izbrane učence! (prostih: ${state.availableChars.length}, izbranih: ${state.multiSelectedStudents.length})`);
-        return;
-    }
-
-    // Naključno premešaj figurice
-    const shuffledChars = shuffle(state.availableChars);
-
-    state.multiSelectedStudents.forEach(studentName => {
-        const char = shuffledChars.pop();
-        const id = makeRentalId();
-        newRentalIds.add(id);
-
-        // Dodaj na začetek seznama (unshift), da bo na vrhu
-        state.rentals.unshift({ id, char, student: studentName, endTime: makeEndTime() });
-
-        // Odstrani iz bazena
-        state.availableChars = state.availableChars.filter(c => c.id !== char.id);
-        state.availableStudents = state.availableStudents.filter(s => s !== studentName);
-    });
-
-    toggleSelectionMode(); // Zapri način izbiranja (počisti izbor in izriše)
-}
-
-function renderRentals() {
-    const el = document.getElementById('rental-list');
-    const count = state.rentals.length;
-
-    // Določanje razreda za mrežo (grid) glede na število aktivnih
-    el.className = count <= 2 ? 'grid-1' : (count <= 4 ? 'grid-2' : 'grid-3');
-    el.innerHTML = count === 0 ? '<div class="empty-msg">Nihče se še ne igra. Izberi par!</div>' : '';
-
-    state.rentals.forEach((rental) => {
-        const div = document.createElement('div');
-        const remains = secondsLeft(rental);
-        div.className = `rental-pair ${newRentalIds.has(rental.id) ? 'new' : ''} ${remains <= 0 ? 'expired' : ''}`;
-        div.innerHTML = `
-            <div class="rental-img-container">
-                <img src="${rental.char.img}" class="rental-img" ${IMG_FALLBACK_ATTR}>
-            </div>
-            <div class="rental-details">
-                <div class="rental-student">${rental.student}</div>
-                <div class="rental-char">${rental.char.name}</div>
-                <div data-timer="${rental.id}" class="timer-display ${remains < 60 ? 'low-time' : ''}">${formatTime(remains)}</div>
-                <button class="return-btn" onclick="returnChar('${rental.id}')">VRNI</button>
-            </div>`;
-        el.appendChild(div);
-    });
-    newRentalIds.clear();
-}
-
-// Posamično parčkanje (ročno: klik figurice + klik učenca)
-function checkPairing() {
-    if (state.selectedCharId && state.selectedStudentName) {
-        const char = state.availableChars.find(c => c.id === state.selectedCharId);
-        if (!char) return;
-        const id = makeRentalId();
-        newRentalIds.add(id);
-
-        state.rentals.unshift({ id, char, student: state.selectedStudentName, endTime: makeEndTime() });
-
-        state.availableChars = state.availableChars.filter(c => c.id !== state.selectedCharId);
-        state.availableStudents = state.availableStudents.filter(s => s !== state.selectedStudentName);
-
-        state.selectedCharId = null;
-        state.selectedStudentName = null;
-        render();
-    }
-}
-
-// Figurice se vrnejo v prvotnem vrstnem redu
-function sortChars() {
-    state.availableChars.sort((a, b) =>
-        characters.findIndex(c => c.id === a.id) - characters.findIndex(c => c.id === b.id));
-}
-
 function returnChar(id) {
-    const r = state.rentals.find(r => String(r.id) === String(id));
-    if (!r) return;
-    state.availableChars.push(r.char);
-    state.availableStudents.push(r.student);
-    state.rentals = state.rentals.filter(x => x !== r);
-    sortChars();
+    state.rentals = state.rentals.filter(r => r.id !== id);
     render();
 }
 
 function returnAll() {
     if (state.rentals.length === 0) return;
     if (confirm("Ali si prepričan, da želiš končati igro za vse učence?")) {
-        state.rentals.forEach(r => {
-            state.availableChars.push(r.char);
-            state.availableStudents.push(r.student);
-        });
         state.rentals = [];
-        sortChars();
         render();
     }
 }
 
+// --- IZRIS ---
+function render() {
+    renderCarousel();
+    renderRentals();
+    renderKnownNames();
+    saveState();
+}
+
+function renderRentals() {
+    const list = $('rental-list');
+    const count = state.rentals.length;
+    list.className = count <= 2 ? 'size-l' : (count <= 8 ? 'size-m' : 'size-s');
+    list.innerHTML = '';
+    $('rental-count').textContent = count ? `${count}` : '';
+    $('return-all').disabled = count === 0;
+    $('random-btn').disabled = count === characters.length;
+    $('grid-btn').disabled = count === characters.length;
+
+    if (count === 0) {
+        const empty = el('div', 'empty');
+        empty.append(el('strong', null, 'Nihče se še ne igra'), 'Klikni figurico na traku zgoraj in vpiši ime.');
+        list.appendChild(empty);
+        return;
+    }
+
+    state.rentals.forEach(rental => {
+        const remains = secondsLeft(rental);
+        const card = el('div', 'card' + (newRentalIds.has(rental.id) ? ' new' : '') + (remains <= 0 ? ' expired' : ''));
+        card.dataset.id = rental.id;
+
+        const imgBox = el('div', 'card-img');
+        const img = el('img');
+        img.alt = '';
+        imgBox.appendChild(setImg(img, rental.char.img));
+        const badge = el('span', 'badge', remains <= 0 ? 'Konec' : 'Igra');
+
+        const foot = el('div', 'card-foot');
+        const timer = el('span', 'timer' + (remains > 0 && remains < 60 ? ' low' : ''), formatTime(remains));
+        const ret = el('button', 'return-btn', 'Vrni');
+        ret.onclick = () => returnChar(rental.id);
+        foot.append(timer, ret);
+
+        card.append(imgBox, badge, el('div', 'student', rental.student), el('div', 'char-name', rental.char.name), foot);
+        list.appendChild(card);
+    });
+    newRentalIds.clear();
+}
+
+function renderKnownNames() {
+    const dl = $('known-names');
+    dl.innerHTML = '';
+    knownNames.forEach(n => { const o = el('option'); o.value = n; dl.appendChild(o); });
+}
+
 function secondsLeft(rental) {
-    return Math.max(0, Math.floor((new Date(rental.endTime) - new Date()) / 1000));
+    return Math.max(0, Math.floor((new Date(rental.endTime) - Date.now()) / 1000));
 }
 
 function formatTime(sec) {
@@ -546,55 +969,49 @@ function formatTime(sec) {
     return `${Math.floor(sec / 60)}:${(sec % 60).toString().padStart(2, '0')}`;
 }
 
-// --- PAMETNI INTERVAL (Osveži samo tekst, ne slik) ---
+// --- Osveži samo čas, ne slik ---
 setInterval(() => {
-    state.rentals.forEach((rental) => {
-        const timerEl = document.querySelector(`[data-timer="${rental.id}"]`);
-        if (!timerEl) return;
+    state.rentals.forEach(rental => {
+        const card = document.querySelector(`.card[data-id="${rental.id}"]`);
+        if (!card) return;
         const remains = secondsLeft(rental);
-        timerEl.innerText = formatTime(remains);
-        timerEl.classList.toggle('low-time', remains < 60);
-        // Obarvaj rob rdeče, ko je konec
-        timerEl.closest('.rental-pair').classList.toggle('expired', remains <= 0);
+        const timer = card.querySelector('.timer');
+        timer.textContent = formatTime(remains);
+        timer.classList.toggle('low', remains > 0 && remains < 60);
+        card.classList.toggle('expired', remains <= 0);
+        card.querySelector('.badge').textContent = remains <= 0 ? 'Konec' : 'Igra';
     });
 }, 1000);
 
 // --- SHRANJEVANJE V POMNILNIK BRSKALNIKA ---
 function saveState() {
     try {
-        localStorage.setItem('legoState', JSON.stringify({
-            availableChars: state.availableChars,
-            availableStudents: state.availableStudents,
-            rentals: state.rentals
-        }));
+        localStorage.setItem('legoState2', JSON.stringify({ rentals: state.rentals }));
+        localStorage.setItem('legoNames', JSON.stringify(knownNames));
     } catch (e) { /* npr. zasebno okno – igra deluje tudi brez shranjevanja */ }
 }
 
-// Naloži ob zagonu (samo, če shranjeno stanje še ustreza trenutnim seznamom)
 function loadState() {
+    const byId = Object.fromEntries(characters.map(c => [c.id, c]));
     try {
-        const saved = localStorage.getItem('legoState');
+        knownNames = JSON.parse(localStorage.getItem('legoNames')) || [];
+    } catch (e) { knownNames = []; }
+    try {
+        // Novo stanje, sicer staro (pred posodobitvijo) – izposoje se ohranijo
+        const saved = JSON.parse(localStorage.getItem('legoState2') || localStorage.getItem('legoState') || 'null');
         if (!saved) return;
-        const parsed = JSON.parse(saved);
-        const rentals = (parsed.rentals || []).map(r => ({ ...r, id: String(r.id) }));
-
-        // Uporabi trenutne podatke o figuricah (če se je spremenilo ime ali slika)
-        const byId = Object.fromEntries(characters.map(c => [c.id, c]));
-        const validRentals = rentals.filter(r => r.char && byId[r.char.id] && studentNames.includes(r.student));
-        validRentals.forEach(r => { r.char = byId[r.char.id]; });
-
-        const rentedCharIds = new Set(validRentals.map(r => r.char.id));
-        const rentedStudents = new Set(validRentals.map(r => r.student));
-
-        state.rentals = validRentals;
-        state.availableChars = characters.filter(c => !rentedCharIds.has(c.id));
-        state.availableStudents = studentNames.filter(s => !rentedStudents.has(s));
+        const seen = new Set();
+        state.rentals = (saved.rentals || [])
+            .filter(r => r.char && byId[r.char.id] && r.student && !seen.has(r.char.id) && seen.add(r.char.id))
+            .map(r => ({ ...r, id: String(r.id), char: byId[r.char.id] }));
     } catch (e) { /* pokvarjeno shranjeno stanje – začni znova */ }
 }
 
 loadState();
-// Začetni izris
 render();
+requestAnimationFrame(tick);
+loadProducts();
+setInterval(() => { if (!document.hidden) loadProducts(); }, PRODUCTS_POLL_MS);
 </script>
 </body>
 </html>
