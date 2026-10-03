@@ -172,21 +172,58 @@ header h1 {
 .prod {
     position: relative;
     background: #fff;
-    border: 0;
     border-radius: 4px;
-    padding: 14px 14px 14px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    text-align: left;
     color: var(--ink);
     transition: transform .15s, box-shadow .15s;
 }
 .prod:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,.35); }
-.prod img { width: 100%; height: clamp(140px, 22vh, 280px); object-fit: contain; }
-.prod .name { font-size: 1.3rem; font-weight: 600; line-height: 1.2; }
+.prod img { width: 100%; height: clamp(140px, 22vh, 280px); object-fit: contain; cursor: pointer; }
 .prod .date { font-size: 1rem; color: var(--muted); }
 .prod .badge { top: 12px; right: 12px; font-size: .95rem; padding: 4px 12px; }
+.prod-foot { display: flex; align-items: center; gap: 10px; }
+.prod-name {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--orange);
+    color: var(--ink);
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background .15s;
+}
+.prod-name:hover { background: var(--orange-dark); }
+.like {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 46px;
+    min-width: 46px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--tile);
+    color: var(--ink);
+    font-size: 1.05rem;
+    font-weight: 600;
+    justify-content: center;
+    transition: background .15s;
+}
+.like:hover { background: #e4e4e8; }
+.like svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+.like.liked { color: var(--red); }
+.like.liked svg { fill: currentColor; }
+.like.pop svg { animation: heartPop .35s ease; }
+@keyframes heartPop { 50% { transform: scale(1.35); } }
 .page-bar { height: 4px; background: rgba(255,255,255,.25); border-radius: 4px; margin: 16px auto 0; width: min(60%, 1000px); position: relative; overflow: hidden; }
 .page-bar span { position: absolute; top: 0; bottom: 0; background: #fff; border-radius: 4px; transition: left .4s, width .4s; }
 [hidden] { display: none !important; }
@@ -765,7 +802,7 @@ function toast(msg, ms = 2600) {
 }
 
 // --- IZDELKI ---
-let products = [];            // [{ id, created_at, name }] najnovejši najprej
+let products = [];            // [{ id, created_at, name, likes }] najnovejši najprej
 const productImages = {};     // id -> data URL
 
 let productsLoadSeq = 0;
@@ -783,7 +820,7 @@ async function loadProducts() {
     if (seq !== productsLoadSeq) return;
     const next = list.filter(p => productImages[p.id]);
     // Trak na novo izrišemo samo, če se je kaj spremenilo
-    const key = arr => arr.map(p => p.id + ':' + (p.name || '')).join();
+    const key = arr => arr.map(p => `${p.id}:${p.name || ''}:${p.likes || 0}`).join();
     if (key(next) !== key(products)) {
         const isNew = next.length && (!products.length || next[0].id !== products[0].id);
         products = next;
@@ -798,17 +835,58 @@ let prodPage = 0;
 let prodHover = false;
 let prodTimer = null;
 
+const LIKED_KEY = 'legoLiked';
+const HEART_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.5 8.2 3.6 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.6 0 5.7 3.7 4.5 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+
+// Kateri izdelki so v tem brskalniku že všečkani (en srček na napravo);
+// če brskalnik ne dovoli shranjevanja, velja vsaj do osvežitve strani
+const liked = (() => {
+    try { return new Set(JSON.parse(localStorage.getItem(LIKED_KEY)) || []); }
+    catch (e) { return new Set(); }
+})();
+function saveLiked() {
+    try { localStorage.setItem(LIKED_KEY, JSON.stringify([...liked])); } catch (e) {}
+}
+
+function likeBtn(p) {
+    const btn = el('button', 'like');
+    btn.type = 'button';
+    const isLiked = liked.has(p.id);
+    btn.classList.toggle('liked', isLiked);
+    btn.title = isLiked ? 'Ne všeč mi je več' : 'Všeč mi je';
+    btn.innerHTML = HEART_SVG;
+    if (p.likes > 0) btn.appendChild(el('span', null, p.likes));
+    btn.onclick = () => toggleLike(p);
+    return btn;
+}
+
+async function toggleLike(p) {
+    const liking = !liked.has(p.id);
+    if (liking) liked.add(p.id); else liked.delete(p.id);
+    saveLiked();
+    // Takoj pokažemo, baza pa vrne pravo število
+    p.likes = Math.max(0, (p.likes || 0) + (liking ? 1 : -1));
+    renderProducts();
+    if (liking) document.querySelector(`.prod[data-id="${p.id}"] .like`)?.classList.add('pop');
+    const n = await rpc('vsec', { p_id: p.id, p_delta: liking ? 1 : -1 });
+    if (typeof n === 'number' && n !== p.likes) { p.likes = n; renderProducts(); }
+}
+
 function prodCard(p) {
-    const card = el('button', 'prod');
-    card.type = 'button';
-    card.onclick = () => openPhoto(p);
+    const card = el('div', 'prod');
+    card.dataset.id = p.id;
     const img = el('img');
-    img.alt = 'Izdelek';
+    img.alt = p.name || 'Izdelek';
     img.src = productImages[p.id];
+    img.onclick = () => openPhoto(p);
     const created = new Date(p.created_at);
-    card.appendChild(img);
-    if (p.name) card.appendChild(el('span', 'name', p.name));
-    card.appendChild(el('span', 'date', created.toLocaleDateString('sl-SI')));
+    const name = el('button', 'prod-name', p.name || 'Poglej izdelek');
+    name.type = 'button';
+    name.title = p.name || '';
+    name.onclick = () => openPhoto(p);
+    const foot = el('div', 'prod-foot');
+    foot.append(name, likeBtn(p));
+    card.append(img, el('span', 'date', created.toLocaleDateString('sl-SI')), foot);
     // "Novo" za izdelke, dodane danes
     if (created.toDateString() === new Date().toDateString()) card.appendChild(el('span', 'badge', 'Novo'));
     return card;
