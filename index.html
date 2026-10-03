@@ -412,6 +412,7 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
     z-index: 1;
 }
 .grid-head h2 { margin: 0; font-size: 1.5rem; }
+.grid-head .count { font-size: 1rem; font-weight: 500; color: var(--muted); }
 .grid-head .close {
     margin-left: auto;
     width: 42px; height: 42px;
@@ -430,6 +431,8 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
 }
 #grid-list .fig { width: auto; }
 #grid-list .fig img { height: 100px; }
+#grid-list .fig-over { height: 100px; }
+#grid-list .fig.taken { background: #fff7d6; border-color: var(--yellow); }
 
 /* --- PRIJAVA --- */
 .login-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
@@ -531,7 +534,7 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
 
 <dialog id="grid-dialog">
     <div class="grid-head">
-        <h2>Izberi figurico</h2>
+        <h2>Vse figurice <span class="count" id="grid-count"></span></h2>
         <button type="button" class="close" id="grid-close" title="Zapri">✕</button>
     </div>
     <div id="grid-list"></div>
@@ -744,13 +747,21 @@ function openDialog(char) {
 }
 
 // Vse proste figurice naenkrat – za hitro izposojo točno določene figurice
-function openGrid() {
+// Vse figurice na enem mestu: tiste, s katerimi se kdo igra, so na vrhu
+// (s časom in gumbom Vrni), da jih ni treba loviti na vrtečem se traku
+function renderGrid() {
     const list = $('grid-list');
+    const byChar = new Map(state.rentals.map(r => [r.char.id, r]));
     list.innerHTML = '';
-    availableChars().forEach(c => list.appendChild(figCard(c, char => {
+    characters.filter(c => byChar.has(c.id)).forEach(c => list.appendChild(takenCard(byChar.get(c.id))));
+    characters.filter(c => !byChar.has(c.id)).forEach(c => list.appendChild(figCard(c, char => {
         $('grid-dialog').close();
         openDialog(char);
     })));
+    $('grid-count').textContent = byChar.size ? `· igra se ${byChar.size}` : '';
+}
+function openGrid() {
+    renderGrid();
     $('grid-dialog').showModal();
     $('grid-close').focus();
 }
@@ -1191,6 +1202,7 @@ function startRental(student, char) {
 function returnChar(id) {
     state.rentals = state.rentals.filter(r => r.id !== id);
     render();
+    if ($('grid-dialog').open) renderGrid();
 }
 
 function returnAll() {
@@ -1213,7 +1225,6 @@ function renderButtons() {
     const count = state.rentals.length;
     $('return-all').disabled = count === 0;
     $('random-btn').disabled = count === characters.length;
-    $('grid-btn').disabled = count === characters.length;
 }
 
 function renderKnownNames() {
