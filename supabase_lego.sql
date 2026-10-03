@@ -33,18 +33,23 @@ create table if not exists lego.izdelki (
   id          uuid primary key default gen_random_uuid(),
   created_at  timestamptz not null default now(),
   teacher_id  uuid references public.teachers(id) on delete set null,
-  image       text not null   -- data:image/jpeg;base64,...
+  image       text not null,  -- data:image/jpeg;base64,...
+  name        text            -- ime izdelka, npr. "Drevesna hišica"
 );
 alter table lego.izdelki enable row level security;
+-- za tabelo, ustvarjeno pred dodajanjem imen
+alter table lego.izdelki add column if not exists name text;
 
 -- ── 2. Branje (javno — stran je javna) ───────────────────────────────────
 -- Najprej samo seznam id-jev, da stran ob vsakem preverjanju ne prenaša
 -- vseh slik znova; slike nato pobere le za nove id-je.
+-- drop: prejšnja različica je vračala manj stolpcev (brez imena)
+drop function if exists lego.seznam();
 create or replace function lego.seznam()
-returns table(id uuid, created_at timestamptz)
+returns table(id uuid, created_at timestamptz, name text)
 language sql stable security definer set search_path = lego, public
 as $$
-  select i.id, i.created_at from lego.izdelki i
+  select i.id, i.created_at, i.name from lego.izdelki i
    order by i.created_at desc
    limit 200;
 $$;
@@ -94,7 +99,22 @@ begin
   return found;
 end; $$;
 
+-- Ime izdelka (prazno ime ga pobriše)
+create or replace function lego.preimenuj(p_teacher uuid, p_id uuid, p_name text)
+returns boolean
+language plpgsql volatile security definer set search_path = lego, public
+as $$
+begin
+  if not exists (select 1 from public.teachers t where t.id = p_teacher and t.approved) then
+    return false;
+  end if;
+  update lego.izdelki
+     set name = nullif(left(btrim(coalesce(p_name, '')), 60), '')
+   where id = p_id;
+  return found;
+end; $$;
+
 grant execute on all functions in schema lego to anon, authenticated;
 
 -- ── Pregled (neobvezno) ───────────────────────────────────────────────────
--- select id, created_at, length(image) / 1024 as kb from lego.izdelki order by created_at desc;
+-- select id, created_at, name, length(image) / 1024 as kb from lego.izdelki order by created_at desc;
