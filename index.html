@@ -13,6 +13,7 @@
     --orange: #F7861E;
     --orange-dark: #D96D0A;
     --blue: #006CB7;
+    --navy: #0B1D5A;
     --ink: #1B1B1F;
     --muted: #6B6B73;
     --line: #E6E6EA;
@@ -136,53 +137,57 @@ header h1 {
 .fig span { font-size: .9rem; font-weight: 600; line-height: 1.15; }
 .carousel-empty { padding: 40px 28px; color: var(--muted); font-size: 1.1rem; }
 
-/* --- IZDELKI (vrsta kartic na dnu, menja se vsakih 10 s) --- */
+/* --- IZDELKI (temno modra vrsta velikih kartic na dnu, menja se vsakih 10 s) --- */
 .products {
     flex-shrink: 0;
-    border-top: 1px solid var(--line);
-    background: #fff;
-    padding: 14px 28px 16px;
+    background: var(--navy);
+    border-top: 6px solid var(--yellow);
+    color: #fff;
+    padding: 18px 28px 18px;
 }
-.products-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.products-head .section-title { margin: 0; font-size: 1.35rem; }
-.arrows { margin-left: auto; display: flex; gap: 8px; }
+.products-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.products-head .section-title { margin: 0; font-size: 1.9rem; font-weight: 800; color: #fff; }
+.products-head .section-title .count { color: rgba(255,255,255,.6); }
+.arrows { margin-left: auto; display: flex; gap: 10px; }
 .arrow {
-    width: 40px; height: 40px;
+    width: 46px; height: 46px;
     border-radius: 50%;
-    border: 2px solid var(--ink);
-    background: #fff;
-    font-size: 1.1rem;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    font-size: 1.4rem;
     font-weight: 700;
     display: grid;
     place-items: center;
-    padding: 0;
+    padding: 0 0 3px;
 }
-.arrow:hover { background: var(--tile); }
+.arrow:hover { background: rgba(255,255,255,.15); }
 #prod-row {
     display: grid;
     grid-template-columns: repeat(var(--per-page, 5), minmax(0, 1fr));
-    gap: 14px;
+    gap: 22px;
     transition: opacity .4s;
 }
 #prod-row.fading { opacity: 0; }
 .prod {
     position: relative;
     background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 10px 10px 8px;
+    border: 0;
+    border-radius: 4px;
+    padding: 14px 14px 14px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     text-align: left;
-    transition: box-shadow .15s, border-color .15s;
+    color: var(--ink);
+    transition: transform .15s, box-shadow .15s;
 }
-.prod:hover { box-shadow: 0 10px 22px rgba(0,0,0,.08); border-color: #cfcfd6; }
-.prod img { width: 100%; height: 100px; object-fit: contain; mix-blend-mode: multiply; }
-.prod .date { font-size: .85rem; color: var(--muted); }
-.prod .badge { top: 10px; right: 10px; }
-.page-bar { height: 3px; background: var(--line); border-radius: 3px; margin: 12px auto 0; width: min(60%, 600px); position: relative; overflow: hidden; }
-.page-bar span { position: absolute; top: 0; bottom: 0; background: var(--ink); border-radius: 3px; transition: left .4s, width .4s; }
+.prod:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,.35); }
+.prod img { width: 100%; height: clamp(140px, 22vh, 280px); object-fit: contain; }
+.prod .date { font-size: 1.05rem; font-weight: 500; }
+.prod .badge { top: 12px; right: 12px; font-size: .95rem; padding: 4px 12px; }
+.page-bar { height: 4px; background: rgba(255,255,255,.25); border-radius: 4px; margin: 16px auto 0; width: min(60%, 1000px); position: relative; overflow: hidden; }
+.page-bar span { position: absolute; top: 0; bottom: 0; background: #fff; border-radius: 4px; transition: left .4s, width .4s; }
 [hidden] { display: none !important; }
 
 /* --- OBVESTILO --- */
@@ -434,6 +439,8 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
     .fig { width: 120px; }
     .fig img { height: 86px; }
     .stage { overflow: visible; padding: 22px 16px 40px; }
+    .products { padding: 16px; }
+    .products-head .section-title { font-size: 1.5rem; }
 }
 </style>
 </head>
@@ -769,7 +776,7 @@ async function loadProducts() {
 }
 
 const PRODUCTS_PAGE_MS = 10000;
-const PROD_CARD_MIN = 190;
+const PROD_CARD_MIN = 320;
 let prodPage = 0;
 let prodHover = false;
 let prodTimer = null;
@@ -791,7 +798,7 @@ function prodCard(p) {
 function perPage() {
     const row = $('prod-row');
     const w = row.clientWidth || window.innerWidth - 56;
-    return Math.max(1, Math.floor((w + 14) / (PROD_CARD_MIN + 14)));
+    return Math.max(1, Math.floor((w + 22) / (PROD_CARD_MIN + 22)));
 }
 
 function pageCount() {
