@@ -135,11 +135,36 @@ header h1 {
 .fig:active { transform: scale(.96); }
 .fig img { width: 100%; height: 110px; object-fit: contain; mix-blend-mode: multiply; }
 .fig span { font-size: .9rem; font-weight: 600; line-height: 1.15; }
+/* Izposojena figurica ostane v traku: zbledi, čez njo čas in gumb Vrni */
+.fig.taken { position: relative; cursor: default; background: #fbfbfc; }
+.fig.taken:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.fig.taken:active { transform: none; }
+.fig.taken > img { opacity: .28; filter: grayscale(.4); }
+.fig.taken .student { font-size: .95rem; font-weight: 700; overflow-wrap: anywhere; }
+.fig-over {
+    position: absolute;
+    top: 12px; left: 8px; right: 8px;
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.fig-over .timer { font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.fig-over .return-btn { padding: 6px 18px; font-size: .95rem; }
+.fig.taken.expired { border: 2px solid var(--red); animation: pulse 1.6s ease-in-out infinite; }
+.fig.taken.expired .timer { color: var(--red); font-size: 1.15rem; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 5px rgba(227,0,11,.18); } }
+.fig.new { animation: popIn .4s cubic-bezier(.175,.885,.32,1.275); }
 .carousel-empty { padding: 40px 28px; color: var(--muted); font-size: 1.1rem; }
 
 /* --- IZDELKI (temno modra vrsta velikih kartic na dnu, menja se vsakih 10 s) --- */
 .products {
-    flex-shrink: 0;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
     background: var(--navy);
     border-top: 6px solid var(--yellow);
     color: #fff;
@@ -163,8 +188,11 @@ header h1 {
 }
 .arrow:hover { background: rgba(255,255,255,.15); }
 #prod-row {
+    flex: 1;
+    min-height: 0;
     display: grid;
     grid-template-columns: repeat(var(--per-page, 5), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 600px);
     gap: 22px;
     transition: opacity .4s;
 }
@@ -181,7 +209,7 @@ header h1 {
     transition: transform .15s, box-shadow .15s;
 }
 .prod:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(0,0,0,.35); }
-.prod img { width: 100%; height: clamp(140px, 22vh, 280px); object-fit: contain; cursor: pointer; }
+.prod img { width: 100%; flex: 1; min-height: 120px; height: 0; object-fit: contain; cursor: pointer; }
 .prod .date { font-size: 1rem; color: var(--muted); }
 .prod .badge { top: 12px; right: 12px; font-size: .95rem; padding: 4px 12px; }
 .prod-foot { display: flex; align-items: center; gap: 10px; }
@@ -248,9 +276,7 @@ header h1 {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* --- AKTIVNE IZPOSOJE --- */
-.stage { flex: 1; overflow-y: auto; padding: 20px 28px 16px; }
-
+/* --- NASLOVI, ČAS, GUMB VRNI --- */
 .section-title {
     display: flex;
     align-items: baseline;
@@ -262,42 +288,7 @@ header h1 {
 .section-title .count { font-size: 1rem; font-weight: 500; color: var(--muted); }
 .carousel-head .section-title { margin: 0; font-size: 1.35rem; }
 
-#rental-list {
-    display: grid;
-    gap: 18px;
-    grid-template-columns: repeat(auto-fill, minmax(var(--card-min, 190px), 1fr));
-}
-/* Ležeče kartice (slika levo), da je pod njimi prostor še za izdelke */
-#rental-list.size-l { --card-min: 400px; --img-h: 140px; grid-template-columns: repeat(auto-fill, minmax(400px, 480px)); }
-#rental-list.size-m { --card-min: 340px; --img-h: 104px; }
-#rental-list.size-s { --card-min: 280px; --img-h: 80px; }
-
 @keyframes popIn { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
-
-.card {
-    position: relative;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-.card-body { flex: 1; min-width: 0; padding-right: 4px; }
-.card.new { animation: popIn .4s cubic-bezier(.175,.885,.32,1.275); }
-.card.expired { border: 2px solid var(--red); }
-
-.card-img {
-    background: var(--tile);
-    border-radius: 12px;
-    width: var(--img-h, 104px);
-    height: var(--img-h, 104px);
-    flex-shrink: 0;
-    position: relative;
-}
-/* multiply: bela ozadja fotografij se zlijejo s sivo ploščico */
-.card-img img { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-fit: contain; mix-blend-mode: multiply; }
 
 .badge {
     position: absolute;
@@ -310,22 +301,11 @@ header h1 {
     padding: 3px 10px;
     border-radius: 6px;
 }
-.card.expired .badge { background: var(--red); color: #fff; }
 
-.student { font-weight: 700; line-height: 1.1; font-size: 1.5rem; overflow-wrap: anywhere; }
-.char-name { color: var(--muted); font-size: 1rem; margin-top: 2px; }
-
-.card-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.timer {
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    font-size: 1.5rem;
-    letter-spacing: .02em;
-}
+.timer { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
 .timer.low { color: var(--red); animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity: .45; } }
 .return-btn {
-    margin-left: auto;
     border: none;
     background: var(--orange);
     color: #fff;
@@ -335,26 +315,6 @@ header h1 {
     font-weight: 600;
 }
 .return-btn:hover { background: var(--orange-dark); }
-
-/* Velike kartice, ko se igra le nekaj otrok */
-.size-l .student { font-size: 2rem; }
-.size-l .char-name { font-size: 1.2rem; }
-.size-l .timer { font-size: 2.1rem; }
-.size-l .return-btn { font-size: 1.15rem; padding: 12px 26px; }
-.size-s .student { font-size: 1.2rem; }
-.size-s .char-name { font-size: .85rem; }
-.size-s .timer { font-size: 1.2rem; }
-.size-s .return-btn { padding: 7px 14px; font-size: .9rem; }
-
-.empty {
-    grid-column: 1 / -1;
-    border: 2px dashed var(--line);
-    border-radius: var(--radius);
-    padding: 60px 20px;
-    text-align: center;
-    color: var(--muted);
-}
-.empty strong { display: block; color: var(--ink); font-size: 1.4rem; margin-bottom: 6px; }
 
 /* --- HITER VNOS IMENA --- */
 dialog {
@@ -488,7 +448,9 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
     .carousel-head .hint { display: none; }
     .fig { width: 120px; }
     .fig img { height: 86px; }
-    .stage { overflow: visible; padding: 22px 16px 40px; }
+    .products { flex: none; }
+    #prod-row { grid-template-rows: auto; }
+    .prod img { flex: none; height: 240px; }
     .products { padding: 16px; }
     .products-head .section-title { font-size: 1.5rem; }
 }
@@ -511,16 +473,11 @@ dialog::backdrop { background: rgba(27,27,31,.45); }
 
 <div class="carousel-head">
     <h2 class="section-title">Figurice <span class="count" id="char-count"></span></h2>
-    <span class="hint">Z miško ustaviš trak · klikni figurico</span>
+    <span class="hint">Z miško ustaviš trak · klikni prosto figurico</span>
 </div>
 <div class="carousel" id="carousel">
     <div class="track" id="track"></div>
 </div>
-
-<section class="stage">
-    <h2 class="section-title">Igra se zdaj <span class="count" id="rental-count"></span></h2>
-    <div id="rental-list"></div>
-</section>
 
 <section class="products" id="products-section" hidden>
     <div class="products-head">
@@ -654,6 +611,9 @@ function makeCarousel(box, track, dir) {
     const c = { offset: 0, setWidth: 0, hovering: false };
     box.addEventListener('mouseenter', () => { c.hovering = true; });
     box.addEventListener('mouseleave', () => { c.hovering = false; });
+    // Na zaslonu na dotik ni miške: dotik ustavi trak za nekaj sekund
+    let holdUntil = 0;
+    box.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') holdUntil = Date.now() + 6000; });
 
     c.fill = (items, makeCard, emptyText) => {
         track.innerHTML = '';
@@ -675,7 +635,7 @@ function makeCarousel(box, track, dir) {
     };
 
     c.step = (dt, paused) => {
-        if (c.setWidth > 0 && !paused && !c.hovering && !reduceMotion)
+        if (c.setWidth > 0 && !paused && !c.hovering && Date.now() > holdUntil && !reduceMotion)
             c.offset = (c.offset + CAROUSEL_SPEED * dt) % c.setWidth;
         track.style.transform = c.setWidth > 0 && !reduceMotion
             ? `translateX(${dir > 0 ? c.offset - c.setWidth : -c.offset}px)` : '';
@@ -695,10 +655,29 @@ function figCard(char, onPick = openDialog) {
     return card;
 }
 
+// Izposojena figurica: zbledela, z imenom učenca, časom in gumbom Vrni
+function takenCard(rental) {
+    const remains = secondsLeft(rental);
+    const card = el('div', 'fig taken' + (remains <= 0 ? ' expired' : '') + (newRentalIds.has(rental.id) ? ' new' : ''));
+    card.dataset.rental = rental.id;
+    card.title = rental.char.name;
+    const img = el('img');
+    img.alt = '';
+    const over = el('div', 'fig-over');
+    const ret = el('button', 'return-btn', 'Vrni');
+    ret.type = 'button';
+    ret.onclick = () => returnChar(rental.id);
+    over.append(el('span', 'timer' + (remains > 0 && remains < 60 ? ' low' : ''), formatTime(remains)), ret);
+    card.append(setImg(img, rental.char.img), el('span', 'student', rental.student), over);
+    return card;
+}
+
 function renderCarousel() {
-    const free = availableChars();
-    $('char-count').textContent = `${free.length} / ${characters.length} prostih`;
-    figCarousel.fill(free, c => figCard(c), 'Vse figurice so izposojene. 🎉');
+    const byChar = new Map(state.rentals.map(r => [r.char.id, r]));
+    $('char-count').textContent = `${characters.length - byChar.size} / ${characters.length} prostih`;
+    // Vse figurice ostanejo na svojem mestu; izposojene samo zbledijo
+    figCarousel.fill(characters, c => byChar.has(c.id) ? takenCard(byChar.get(c.id)) : figCard(c));
+    newRentalIds.clear();
 }
 
 let lastTime = null;
@@ -1151,51 +1130,16 @@ function returnAll() {
 // --- IZRIS ---
 function render() {
     renderCarousel();
-    renderRentals();
+    renderButtons();
     renderKnownNames();
     saveState();
 }
 
-function renderRentals() {
-    const list = $('rental-list');
+function renderButtons() {
     const count = state.rentals.length;
-    list.className = count <= 2 ? 'size-l' : (count <= 8 ? 'size-m' : 'size-s');
-    list.innerHTML = '';
-    $('rental-count').textContent = count ? `${count}` : '';
     $('return-all').disabled = count === 0;
     $('random-btn').disabled = count === characters.length;
     $('grid-btn').disabled = count === characters.length;
-
-    if (count === 0) {
-        const empty = el('div', 'empty');
-        empty.append(el('strong', null, 'Nihče se še ne igra'), 'Klikni figurico na traku zgoraj in vpiši ime.');
-        list.appendChild(empty);
-        return;
-    }
-
-    state.rentals.forEach(rental => {
-        const remains = secondsLeft(rental);
-        const card = el('div', 'card' + (newRentalIds.has(rental.id) ? ' new' : '') + (remains <= 0 ? ' expired' : ''));
-        card.dataset.id = rental.id;
-
-        const imgBox = el('div', 'card-img');
-        const img = el('img');
-        img.alt = '';
-        imgBox.appendChild(setImg(img, rental.char.img));
-        const badge = el('span', 'badge', remains <= 0 ? 'Konec' : 'Igra');
-
-        const foot = el('div', 'card-foot');
-        const timer = el('span', 'timer' + (remains > 0 && remains < 60 ? ' low' : ''), formatTime(remains));
-        const ret = el('button', 'return-btn', 'Vrni');
-        ret.onclick = () => returnChar(rental.id);
-        foot.append(timer, ret);
-
-        const body = el('div', 'card-body');
-        body.append(el('div', 'student', rental.student), el('div', 'char-name', rental.char.name), foot);
-        card.append(imgBox, body, badge);
-        list.appendChild(card);
-    });
-    newRentalIds.clear();
 }
 
 function renderKnownNames() {
@@ -1216,14 +1160,14 @@ function formatTime(sec) {
 // --- Osveži samo čas, ne slik ---
 setInterval(() => {
     state.rentals.forEach(rental => {
-        const card = document.querySelector(`.card[data-id="${rental.id}"]`);
-        if (!card) return;
         const remains = secondsLeft(rental);
-        const timer = card.querySelector('.timer');
-        timer.textContent = formatTime(remains);
-        timer.classList.toggle('low', remains > 0 && remains < 60);
-        card.classList.toggle('expired', remains <= 0);
-        card.querySelector('.badge').textContent = remains <= 0 ? 'Konec' : 'Igra';
+        // trak ima več kopij iste kartice
+        document.querySelectorAll(`.fig[data-rental="${rental.id}"]`).forEach(card => {
+            const timer = card.querySelector('.timer');
+            timer.textContent = formatTime(remains);
+            timer.classList.toggle('low', remains > 0 && remains < 60);
+            card.classList.toggle('expired', remains <= 0);
+        });
     });
 }, 1000);
 
